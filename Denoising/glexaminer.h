@@ -1,7 +1,7 @@
 #ifndef GLEXAMINER_H
 #define GLEXAMINER_H
 
-#include <OpenMesh/Core/Geometry/VectorT.hh>
+#include "OpenMesh/Core/Geometry/VectorT.hh"
 class QMouseEvent;
 class QWheelEvent;
 

@@ -2,7 +2,7 @@
 #define GLWRAPPER_H
 
 #include <QtOpenGL>
-#include <OpenMesh/Core/Geometry/VectorT.hh>
+#include "OpenMesh/Core/Geometry/VectorT.hh"
 
 // Mac OS X
 #ifdef __APPLE__
