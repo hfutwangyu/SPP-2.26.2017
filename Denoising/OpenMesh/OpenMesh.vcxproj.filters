@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Mesh\ArrayKernel.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh\ArrayKernelT.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh\BaseKernel.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Utils\BaseProperty.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\reader\BaseReader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\BaseWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\BinaryHelper.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Utils\Endian.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\IOManager.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Geometry\NormalConeT.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\reader\OBJReader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\OBJWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\reader\OFFReader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\OFFWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\OMFormat.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\OMFormatT.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\reader\OMReader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\OMWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\reader\PLYReader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\PLYWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh\PolyConnectivity.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh\PolyMeshT.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Utils\RandomNumberGenerator.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\reader\STLReader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\STLWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Utils\SingletonT.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh\TriConnectivity.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Mesh\TriMeshT.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\IO\writer\VTKWriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\System\omstream.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\Mesh\ArrayItems.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\ArrayKernel.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\AttribKernelT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\Attributes.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\AutoPropertyHandleT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\exporter\BaseExporter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\importer\BaseImporter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\BaseKernel.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\BaseMesh.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\BaseProperty.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\reader\BaseReader.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\BaseWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\BinaryHelper.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\Casts.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\CirculatorsT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\Config.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\Endian.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\exporter\ExporterT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\FinalMeshItemsT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\GenProg.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\Handles.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\IOInstances.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\IOManager.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\importer\ImporterT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\IteratorsT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\LoopSchemeMaskT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\MathDefs.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\MeshIO.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\Noncopyable.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\NormalConeT.cc">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\NormalConeT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\reader\OBJReader.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\OBJWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\OFFFormat.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\reader\OFFReader.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\OFFWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\OMFormat.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\reader\OMReader.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\OMWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\System\OpenMeshDLLMacros.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\Options.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\reader\PLYReader.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\PLYWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\Plane3d.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\PolyConnectivity.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\PolyMeshT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\PolyMesh_ArrayKernelT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\Property.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\PropertyContainer.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\PropertyManager.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\QuadricT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\RandomNumberGenerator.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\SR_binary.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\SR_binary_spec.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\SR_rbo.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\SR_store.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\SR_types.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\reader\STLReader.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\STLWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\SingletonT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\Status.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\StoreRestore.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\Traits.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\TriConnectivity.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\TriMeshT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\TriMesh_ArrayKernelT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IO\writer\VTKWriter.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\VectorT.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Geometry\VectorT_inc.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\gen\circulators_header.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\gen\circulators_template.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\color_cast.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\System\compiler.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\System\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\System\config.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\gen\footer.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\gen\iterators_header.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Mesh\gen\iterators_template.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\System\mostream.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\System\omstream.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\vector_cast.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Utils\vector_traits.hh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
