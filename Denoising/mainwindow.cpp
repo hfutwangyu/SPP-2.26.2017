@@ -102,6 +102,12 @@ void MainWindow::CreateActions()
 	action_render_faces_->setChecked(true);
 	connect(action_render_faces_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawFacesStatus(bool)));
 
+	action_render_layers_ = new QAction(QIcon("layers.ico"), tr("Render Layers"), this);//add for slice layers 3-8-2017
+	action_render_layers_->setStatusTip("Render Layers.");
+	action_render_layers_->setCheckable(true);
+	//action_render_layers_->setChecked(true);
+	connect(action_render_layers_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawLayersStatus(bool)));
+
 	action_set_background_color_ = new QAction(QIcon(":/Icons/background.ico"), tr("Change Background Color"), this);
 	action_set_background_color_->setStatusTip("Change Background Color.");
 	connect(action_set_background_color_, SIGNAL(triggered()), opengl_viewer_, SLOT(setBackgroundColor()));
@@ -197,6 +203,7 @@ void MainWindow::CreateToolBars()
 	toolbar_opengl_info_->addAction(action_render_points_);
 	toolbar_opengl_info_->addAction(action_render_edges_);
 	toolbar_opengl_info_->addAction(action_render_faces_);
+	toolbar_opengl_info_->addAction(action_render_layers_);//add for layers 3-8-2017
 	toolbar_opengl_info_->addSeparator();
 	toolbar_opengl_info_->addAction(action_set_background_color_);
 

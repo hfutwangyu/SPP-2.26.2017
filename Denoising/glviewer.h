@@ -37,6 +37,10 @@ public slots:
         this->updateGL();
     }
 
+	void setDrawLayersStatus(bool _val){//add for layers 3-8-2017
+		examiner_->setDrawLayersStatus(_val);
+		this->updateGL();
+	}
     void setBackgroundColor(){
         QColor color = QColorDialog::getColor(Qt::black, this, tr("Set Background Color!"));
         if(!color.isValid()) return;

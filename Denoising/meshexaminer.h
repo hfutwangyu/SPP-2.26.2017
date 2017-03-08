@@ -29,13 +29,16 @@ public:
         draw_edges_status_ = _val;
     }
 
+	void setDrawLayersStatus(bool _val){
+		draw_layers_status_ = _val;
+	}
 protected:
     TriMesh mesh_show_;
 
     bool draw_points_status_;
     bool draw_edges_status_;
     bool draw_faces_status_;
-
+	bool draw_layers_status_;//add for slice layers 3-8-2017
     // compute the bounding box of a mesh
     bool meshBoundingBox(TriMesh::Point &min_coord, TriMesh::Point &max_coord);
 };
