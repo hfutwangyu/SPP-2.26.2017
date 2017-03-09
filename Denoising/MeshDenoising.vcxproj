@@ -146,6 +146,7 @@
     <ClCompile Include="Algorithms\Noise.cpp" />
     <ClCompile Include="Algorithms\NonIterativeFeaturePreservingMeshFiltering.cpp" />
     <ClCompile Include="calculationthread.cpp" />
+    <ClCompile Include="Clipper\clipper.cpp" />
     <ClCompile Include="datamanager.cpp" />
     <ClCompile Include="Debug\moc_calculationthread.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -165,6 +166,7 @@
     <ClCompile Include="GeneratedFiles\qrc_mainwindow.cpp" />
     <ClCompile Include="glexaminer.cpp" />
     <ClCompile Include="glviewer.cpp" />
+    <ClCompile Include="GetHexagonalSubarea.cpp" />
     <ClCompile Include="iothread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
@@ -183,6 +185,7 @@
     <ClInclude Include="Algorithms\MeshDenoisingViaL0Minimization.h" />
     <ClInclude Include="Algorithms\Noise.h" />
     <ClInclude Include="Algorithms\NonIterativeFeaturePreservingMeshFiltering.h" />
+    <ClInclude Include="GetHexagonalSubarea.h" />
     <ClInclude Include="ScanPathPlan.h" />
     <ClInclude Include="Slice.h" />
     <CustomBuild Include="calculationthread.h">

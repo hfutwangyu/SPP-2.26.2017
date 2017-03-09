@@ -176,15 +176,15 @@ void Slice::GetContour(TriMesh &mesh, std::vector<int> &edges_status, TriMesh::H
 
 void Slice::SliceTheModel(TriMesh &mesh)
 {
-	double max_z = 1.0e-9;
-	double min_z = 1.0e8;
-	GetMaxMinZ(mesh, max_z, min_z);
+	//double max_z = 1.0e-9;
+	//double min_z = 1.0e8;
+	GetMaxMinZ(mesh, model_max_z, model_min_z);
 
-	layers_number = GetLayersNumber(mesh, thickness, max_z, min_z);
+	layers_number = GetLayersNumber(mesh, thickness, model_max_z, model_min_z);
 	//slicing.resize(layers_number);
 	for (int i = 1; i < (layers_number + 1); i++)//get intersected contours layer by layer
 	{
-		double z_height = min_z + i*thickness;
+		double z_height = model_min_z + i*thickness;
 		TriMesh::Contours z_contours;//intersected contours of each layer
 		std::vector<int> edges_status((int)mesh.n_edges(), 0);//set all edges' status 0(not checked)
 

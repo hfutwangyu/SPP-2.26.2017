@@ -51,6 +51,9 @@
 #include <vector>
 #include <algorithm>
 
+#include "Clipper/clipper.hpp"///////////////////add for hexagonal subarea 3-8-1017
+using namespace ClipperLib;
+
 //== NAMESPACES ===============================================================
 
 namespace OpenMesh {
@@ -111,6 +114,13 @@ namespace OpenMesh {
 		typedef std::vector<Point>                    Polylines;
 		typedef std::vector<Polylines>                Contours;
 		typedef std::vector<Contours>                 Slicing;
+		// Define the data structure of hexagonal subarea  3.8.2017
+		typedef std::vector<PolyTree>                 HexagonedSubareasInt_Polytree;
+		typedef std::vector<PolyTree>                 AreasBetweenHexagonsInt;
+		typedef std::vector<Paths>                    HexagonedSubareasInt_Paths;
+		typedef std::vector<Point>                    Subareas;
+		typedef std::vector<Subareas>                 SegmentedLayers;
+		typedef std::vector<SegmentedLayers>          SegmentedSlicing;
 	public:
 
 		//-------------------------------------------------- constructor / destructor
@@ -774,9 +784,13 @@ namespace OpenMesh {
 		{
 			return this->property(data_hpph_, _heh);
 		}
-
+		// Define public members of mesh 2.23.2017
 		Slicing mesh_slicing_;
-
+		// Define public members of mesh 3.8.2017
+		HexagonedSubareasInt_Polytree mesh_hexagoned_subareas_int_polytree_;
+		HexagonedSubareasInt_Paths mesh_hexagoned_hexagons_int_paths_;
+		AreasBetweenHexagonsInt mesh_areas_betweent_hexagons_int_;
+		SegmentedSlicing mesh_segmented_slicing;
 	private:
 		//standard vertex properties
 		PointsPropertyHandle                      points_;

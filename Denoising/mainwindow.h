@@ -84,6 +84,7 @@ private:
 	QAction *action_render_edges_;
 	QAction *action_render_faces_;
 	QAction *action_render_layers_;//add for layers 3-8-2017
+	QAction *action_render_hexagonal_subareas_;//add for hexagonal subareas 3-8-2017
 	QAction *action_set_background_color_;
 
 	QAction *action_to_noisy_mesh_;

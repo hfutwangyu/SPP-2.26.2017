@@ -4,7 +4,7 @@
 #include <QString>
 
 MeshExaminer::MeshExaminer()
-:draw_points_status_(false), draw_edges_status_(false), draw_faces_status_(true),draw_layers_status_(false)
+:draw_points_status_(false), draw_edges_status_(false), draw_faces_status_(true), draw_layers_status_(false), draw_hexagons_status_(false)
 {
 
 }
@@ -134,7 +134,31 @@ void MeshExaminer::draw()
 				glEnd();
 			}
 		}
+	}
 
+	if (draw_hexagons_status_)
+	{
+		for (auto mesh_segmented_slicing_it = mesh_show_.mesh_segmented_slicing.begin(); mesh_segmented_slicing_it != mesh_show_.mesh_segmented_slicing.end();
+			mesh_segmented_slicing_it++)
+		{
+			TriMesh::SegmentedLayers segmented_layers = *mesh_segmented_slicing_it;
+			for (auto segmented_layers_it = segmented_layers.begin(); segmented_layers_it != segmented_layers.end();
+				segmented_layers_it++)
+			{
+				TriMesh::Subareas layer_subarea = *segmented_layers_it;
+
+				glLineWidth(3);
+				glBegin(GL_LINE_LOOP);
+				for (auto layer_subarea_it = layer_subarea.begin(); layer_subarea_it != layer_subarea.end(); layer_subarea_it++)
+				{
+					TriMesh::Point p = *layer_subarea_it;
+					glColor3f(0.3f, 0.3f, 0.3f);
+					glVertex3f(p[0], p[1], p[2]);
+				}
+				glEnd();
+
+			}
+		}
 	}
 }
 

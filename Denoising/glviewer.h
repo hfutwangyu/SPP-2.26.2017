@@ -41,6 +41,11 @@ public slots:
 		examiner_->setDrawLayersStatus(_val);
 		this->updateGL();
 	}
+
+	void setDrawHexagonsStatus(bool _val){//add for hexagonal subareas 3-9-2017
+		examiner_->setDrawHexagonsStatus(_val);
+		this->updateGL();
+	}
     void setBackgroundColor(){
         QColor color = QColorDialog::getColor(Qt::black, this, tr("Set Background Color!"));
         if(!color.isValid()) return;

@@ -108,6 +108,11 @@ void MainWindow::CreateActions()
 	//action_render_layers_->setChecked(true);
 	connect(action_render_layers_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawLayersStatus(bool)));
 
+	action_render_hexagonal_subareas_ = new QAction(QIcon("hexagon.ico"), tr("Render Hexagonal Subareas"), this);//add for hexagonal subareas 3-9-2017
+	action_render_hexagonal_subareas_->setStatusTip("Render Hexagonal Subareas.");
+	action_render_hexagonal_subareas_->setCheckable(true);
+	connect(action_render_hexagonal_subareas_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawHexagonsStatus(bool)));
+
 	action_set_background_color_ = new QAction(QIcon(":/Icons/background.ico"), tr("Change Background Color"), this);
 	action_set_background_color_->setStatusTip("Change Background Color.");
 	connect(action_set_background_color_, SIGNAL(triggered()), opengl_viewer_, SLOT(setBackgroundColor()));
@@ -204,6 +209,7 @@ void MainWindow::CreateToolBars()
 	toolbar_opengl_info_->addAction(action_render_edges_);
 	toolbar_opengl_info_->addAction(action_render_faces_);
 	toolbar_opengl_info_->addAction(action_render_layers_);//add for layers 3-8-2017
+	toolbar_opengl_info_->addAction(action_render_hexagonal_subareas_);//add for hexagonal subareas 3-8-2017
 	toolbar_opengl_info_->addSeparator();
 	toolbar_opengl_info_->addAction(action_set_background_color_);
 

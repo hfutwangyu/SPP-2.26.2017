@@ -3,6 +3,7 @@
 
 #include "../Algorithms/MeshDenoisingBase.h"
 #include "Slice.h"
+#include "GetHexagonalSubarea.h"
 class ScanPathPlan : public MeshDenoisingBase
 {
 public:

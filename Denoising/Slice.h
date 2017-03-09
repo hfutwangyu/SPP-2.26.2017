@@ -29,7 +29,8 @@ public:
 	double thickness;
 	int layers_number;
 	TriMesh::Slicing slicing;
-
+	double model_max_z = 1.0e-9;
+	double model_min_z = 1.0e8;
 
 };
 
