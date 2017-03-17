@@ -164,6 +164,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_mainwindow.cpp" />
+    <ClCompile Include="GetHexagonHatches.cpp" />
     <ClCompile Include="glexaminer.cpp" />
     <ClCompile Include="glviewer.cpp" />
     <ClCompile Include="GetHexagonalSubarea.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Algorithms\Noise.h" />
     <ClInclude Include="Algorithms\NonIterativeFeaturePreservingMeshFiltering.h" />
     <ClInclude Include="GetHexagonalSubarea.h" />
+    <ClInclude Include="GetHexagonHatches.h" />
     <ClInclude Include="ScanPathPlan.h" />
     <ClInclude Include="Slice.h" />
     <CustomBuild Include="calculationthread.h">
@@ -372,7 +374,9 @@ endlocal
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="hexagon.ico" />
     <Image Include="Icons\layers.ico" />
+    <Image Include="interval.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

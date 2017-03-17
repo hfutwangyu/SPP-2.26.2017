@@ -36,6 +36,17 @@ public:
 	void setDrawHexagonsStatus(bool _val){
 		draw_hexagons_status_ = _val;
 	}
+
+	void setDrawIntervalsStatus(bool _val){///add 3.14.2017
+		draw_intervals_status_ = _val;
+	}
+
+	void setDrawParallelHatchessStatus(bool _val){///add 3.15.2017
+		draw_parallel_hatches_status_ = _val;
+	}
+	void setShowSingleLayerNumber(int num){////////add 3.13.2017
+	    show_single_layer_number_ = num;
+	}
 protected:
     TriMesh mesh_show_;
 
@@ -44,7 +55,10 @@ protected:
     bool draw_faces_status_;
 	bool draw_layers_status_;//add for slice layers 3-8-2017
 	bool draw_hexagons_status_;//add for hexagonal subarea 3-8-2017
+	bool draw_intervals_status_;//sdd for intervals 3.14.2017
+	bool draw_parallel_hatches_status_;//add for parallel hatches of hexagonal subareas 3.15.2017
     // compute the bounding box of a mesh
+	int show_single_layer_number_;///add 3.13.2017
     bool meshBoundingBox(TriMesh::Point &min_coord, TriMesh::Point &max_coord);
 };
 

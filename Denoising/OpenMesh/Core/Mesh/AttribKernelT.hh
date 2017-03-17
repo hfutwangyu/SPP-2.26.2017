@@ -115,12 +115,23 @@ namespace OpenMesh {
 		typedef std::vector<Polylines>                Contours;
 		typedef std::vector<Contours>                 Slicing;
 		// Define the data structure of hexagonal subarea  3.8.2017
-		typedef std::vector<PolyTree>                 HexagonedSubareasInt_Polytree;
-		typedef std::vector<PolyTree>                 AreasBetweenHexagonsInt;
-		typedef std::vector<Paths>                    HexagonedSubareasInt_Paths;
+		typedef std::vector<PolyTree>                 HexagonedSubareasInt_Polytree;//clipper structure
+		typedef std::vector<PolyTree>                 AreasBetweenHexagonsInt_Polytree;///clipper structure
+		typedef std::vector<Paths>                    AreasBetweenHexagonsInt_Paths;///clipper structure
+		typedef std::vector<Paths>                    HexagonedSubareasInt_Paths; // clipper structure
 		typedef std::vector<Point>                    Subareas;
 		typedef std::vector<Subareas>                 SegmentedLayers;
-		typedef std::vector<SegmentedLayers>          SegmentedSlicing;
+		typedef std::vector<SegmentedLayers>          SegmentedSlicing;//segment layers into hexagonal subareas
+
+		typedef std::vector<std::vector<Paths>>       HexagonHatchesInt;//parallel line for hexagonal subarea hatches 3.15.2017
+		typedef std::vector<Point>                    Segment;
+		typedef std::vector<Segment>                  HatchesForOneHexagonSubarea;
+		typedef std::vector<HatchesForOneHexagonSubarea> HatchesForOneLayer;
+		typedef std::vector<HatchesForOneLayer>       HexagonHatchesDouble;
+
+		typedef std::vector<Point>                    BetweenSubareas;
+		typedef std::vector<BetweenSubareas>          BetweenSegmentedLayers;
+		typedef std::vector<BetweenSegmentedLayers>   BetweenSegmentedSlicing;//blank between hexagonal subareas
 	public:
 
 		//-------------------------------------------------- constructor / destructor
@@ -787,10 +798,15 @@ namespace OpenMesh {
 		// Define public members of mesh 2.23.2017
 		Slicing mesh_slicing_;
 		// Define public members of mesh 3.8.2017
-		HexagonedSubareasInt_Polytree mesh_hexagoned_subareas_int_polytree_;
-		HexagonedSubareasInt_Paths mesh_hexagoned_hexagons_int_paths_;
-		AreasBetweenHexagonsInt mesh_areas_betweent_hexagons_int_;
-		SegmentedSlicing mesh_segmented_slicing;
+		HexagonedSubareasInt_Polytree mesh_hexagoned_subareas_int_polytree_; // clipper structure
+		HexagonedSubareasInt_Paths mesh_hexagoned_hexagons_int_paths_; // clipper structure
+		AreasBetweenHexagonsInt_Polytree mesh_areas_betweent_hexagons_int_polytree_; // clipper structure
+		AreasBetweenHexagonsInt_Paths mesh_areas_betweent_hexagons_int_paths_;
+		SegmentedSlicing mesh_segmented_slicing;// //segment layers into hexagonal subareas
+		BetweenSegmentedSlicing mesh_between_segmented_slicing_;//blank between hexagonal subareas
+
+		HexagonHatchesInt mesh_hexagon_hatches_int_;// parallel lines for hexagonal subarea hatches 3.15.2017
+		HexagonHatchesDouble mesh_hexagon_hatches_double_;
 	private:
 		//standard vertex properties
 		PointsPropertyHandle                      points_;

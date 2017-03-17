@@ -5,6 +5,7 @@
 #include "meshexaminer.h"
 
 #include <QColorDialog>
+#include <QInputDialog>
 
 class GLViewer : public QGLWidget
 {
@@ -46,13 +47,22 @@ public slots:
 		examiner_->setDrawHexagonsStatus(_val);
 		this->updateGL();
 	}
+	void setDrawIntervalsStatus(bool _val){//add for intervals 3.14.2017
+		examiner_->setDrawIntervalsStatus(_val);
+		this->updateGL();
+	}
+
+	void setDrawParallelHatchessStatus(bool _val){//add for parallel hatches of hexagonal subareas 3.15.2017
+		examiner_->setDrawParallelHatchessStatus(_val);
+		this->updateGL();
+	}
+
     void setBackgroundColor(){
         QColor color = QColorDialog::getColor(Qt::black, this, tr("Set Background Color!"));
         if(!color.isValid()) return;
         this->qglClearColor(color);
         this->updateGL();
     }
-
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -64,8 +74,10 @@ protected:
     void resizeGL(int _w, int _h);
     void paintGL();
 
-private:
-    MeshExaminer *examiner_;
+//private:
+//    MeshExaminer *examiner_;
+public:
+	MeshExaminer *examiner_;///change 3.13.2017
 };
 
 #endif // GLVIEWER_H

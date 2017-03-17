@@ -101,12 +101,19 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 		{
 			Paths contours_integer = layers_integer_[i];
 			Paths hexagon = hexagons_in_layers_interger_[i];
-			Paths layer_solution_;
-			Clipper c;
-			c.AddPaths(contours_integer, ptSubject, true);
-			c.AddPaths(hexagon, ptClip, true);
-			c.Execute(ctIntersection, layer_solution_, pftEvenOdd, pftEvenOdd);
-			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_);
+			Paths layer_solution_intersection_;
+			Clipper c_intersection;
+			c_intersection.AddPaths(contours_integer, ptSubject, true);
+			c_intersection.AddPaths(hexagon, ptClip, true);
+			c_intersection.Execute(ctIntersection, layer_solution_intersection_, pftEvenOdd, pftEvenOdd);
+			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_intersection_);
+			
+			Paths layer_solution_difference_;
+			Clipper c_difference;
+			c_difference.AddPaths(contours_integer, ptSubject, true);
+			c_difference.AddPaths(layer_solution_intersection_, ptClip, true);
+			c_difference.Execute(ctDifference,layer_solution_difference_,pftEvenOdd,pftEvenOdd);
+			mesh.mesh_areas_betweent_hexagons_int_paths_.push_back(layer_solution_difference_);
 		}
 	}
 	else

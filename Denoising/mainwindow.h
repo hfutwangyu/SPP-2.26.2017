@@ -55,6 +55,8 @@ private:
 	void setActionAndWidget(bool value1, bool value2);
 	void needToUpdateGL(bool value);
 
+	void ShowSingleLayer();//add 3.13.2017
+
 	void About();
 
 private:
@@ -64,6 +66,7 @@ private:
 	QMenu *menu_file_;
 	QMenu *menu_algorithms_;
 	QMenu *menu_help_;
+	QMenu *menu_view_;
 
 	QAction *action_import_mesh_;
 	QAction *action_export_mesh_;
@@ -78,6 +81,8 @@ private:
 	QAction *action_mesh_denoising_via_l0_minimization_;
 	QAction *action_guided_mesh_normal_filtering_;
 
+	QAction *action_show_single_layer_;///add 3.13.2017
+
 	QAction *action_about_;
 
 	QAction *action_render_points_;
@@ -85,6 +90,8 @@ private:
 	QAction *action_render_faces_;
 	QAction *action_render_layers_;//add for layers 3-8-2017
 	QAction *action_render_hexagonal_subareas_;//add for hexagonal subareas 3-8-2017
+	QAction *action_render_intervals_;//add for intervals 3.14.2017
+	QAction *action_render_parallel_hatches_;//add for parallel hatches of hexagonal subareas 3.15.2017
 	QAction *action_set_background_color_;
 
 	QAction *action_to_noisy_mesh_;

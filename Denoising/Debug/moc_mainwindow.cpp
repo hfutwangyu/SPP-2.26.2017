@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[24];
-    char stringdata0[502];
+    QByteArrayData data[25];
+    char stringdata0[518];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -52,7 +52,8 @@ QT_MOC_LITERAL(19, 461, 6), // "value1"
 QT_MOC_LITERAL(20, 468, 6), // "value2"
 QT_MOC_LITERAL(21, 475, 14), // "needToUpdateGL"
 QT_MOC_LITERAL(22, 490, 5), // "value"
-QT_MOC_LITERAL(23, 496, 5) // "About"
+QT_MOC_LITERAL(23, 496, 15), // "ShowSingleLayer"
+QT_MOC_LITERAL(24, 512, 5) // "About"
 
     },
     "MainWindow\0ImportMesh\0\0ExportMesh\0"
@@ -67,7 +68,8 @@ QT_MOC_LITERAL(23, 496, 5) // "About"
     "ShowMeshDenoisingViaL0MinimizationWidget\0"
     "ShowGuidedMeshNormalFilteringWidget\0"
     "setActionAndWidget\0value1\0value2\0"
-    "needToUpdateGL\0value\0About"
+    "needToUpdateGL\0value\0ShowSingleLayer\0"
+    "About"
 };
 #undef QT_MOC_LITERAL
 
@@ -77,7 +79,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      18,   14, // methods
+      19,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -85,24 +87,25 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  104,    2, 0x08 /* Private */,
-       3,    0,  105,    2, 0x08 /* Private */,
-       4,    0,  106,    2, 0x08 /* Private */,
-       5,    0,  107,    2, 0x08 /* Private */,
-       6,    0,  108,    2, 0x08 /* Private */,
-       7,    0,  109,    2, 0x08 /* Private */,
-       8,    1,  110,    2, 0x08 /* Private */,
-      10,    0,  113,    2, 0x08 /* Private */,
-      11,    0,  114,    2, 0x08 /* Private */,
-      12,    0,  115,    2, 0x08 /* Private */,
-      13,    0,  116,    2, 0x08 /* Private */,
-      14,    0,  117,    2, 0x08 /* Private */,
-      15,    0,  118,    2, 0x08 /* Private */,
-      16,    0,  119,    2, 0x08 /* Private */,
-      17,    0,  120,    2, 0x08 /* Private */,
-      18,    2,  121,    2, 0x08 /* Private */,
-      21,    1,  126,    2, 0x08 /* Private */,
-      23,    0,  129,    2, 0x08 /* Private */,
+       1,    0,  109,    2, 0x08 /* Private */,
+       3,    0,  110,    2, 0x08 /* Private */,
+       4,    0,  111,    2, 0x08 /* Private */,
+       5,    0,  112,    2, 0x08 /* Private */,
+       6,    0,  113,    2, 0x08 /* Private */,
+       7,    0,  114,    2, 0x08 /* Private */,
+       8,    1,  115,    2, 0x08 /* Private */,
+      10,    0,  118,    2, 0x08 /* Private */,
+      11,    0,  119,    2, 0x08 /* Private */,
+      12,    0,  120,    2, 0x08 /* Private */,
+      13,    0,  121,    2, 0x08 /* Private */,
+      14,    0,  122,    2, 0x08 /* Private */,
+      15,    0,  123,    2, 0x08 /* Private */,
+      16,    0,  124,    2, 0x08 /* Private */,
+      17,    0,  125,    2, 0x08 /* Private */,
+      18,    2,  126,    2, 0x08 /* Private */,
+      21,    1,  131,    2, 0x08 /* Private */,
+      23,    0,  134,    2, 0x08 /* Private */,
+      24,    0,  135,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -122,6 +125,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Bool, QMetaType::Bool,   19,   20,
     QMetaType::Void, QMetaType::Bool,   22,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -150,7 +154,8 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 14: _t->ShowGuidedMeshNormalFilteringWidget(); break;
         case 15: _t->setActionAndWidget((*reinterpret_cast< bool(*)>(_a[1])),(*reinterpret_cast< bool(*)>(_a[2]))); break;
         case 16: _t->needToUpdateGL((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 17: _t->About(); break;
+        case 17: _t->ShowSingleLayer(); break;
+        case 18: _t->About(); break;
         default: ;
         }
     }
@@ -181,13 +186,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 18)
+        if (_id < 19)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 18;
+        _id -= 19;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 18)
+        if (_id < 19)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 18;
+        _id -= 19;
     }
     return _id;
 }

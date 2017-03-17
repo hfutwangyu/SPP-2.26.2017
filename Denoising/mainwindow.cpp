@@ -113,6 +113,17 @@ void MainWindow::CreateActions()
 	action_render_hexagonal_subareas_->setCheckable(true);
 	connect(action_render_hexagonal_subareas_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawHexagonsStatus(bool)));
 
+	action_render_intervals_ = new QAction(QIcon("interval.ico"), tr("Render intervals"), this);//add for intervals 3.14.2017
+	action_render_intervals_->setStatusTip("Render Intervals.");
+	action_render_intervals_->setCheckable(true);
+	connect(action_render_intervals_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawIntervalsStatus(bool)));
+
+	action_render_parallel_hatches_ = new QAction(QIcon("ParallelHatches.ico"), tr("Render Parallel Hatches"), this);//add for parallel hatches 3.15.2017
+	action_render_parallel_hatches_->setStatusTip("Render Parallel hatches.");
+	action_render_parallel_hatches_->setCheckable(true);
+	connect(action_render_parallel_hatches_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawParallelHatchessStatus(bool)));
+
+
 	action_set_background_color_ = new QAction(QIcon(":/Icons/background.ico"), tr("Change Background Color"), this);
 	action_set_background_color_->setStatusTip("Change Background Color.");
 	connect(action_set_background_color_, SIGNAL(triggered()), opengl_viewer_, SLOT(setBackgroundColor()));
@@ -146,7 +157,7 @@ void MainWindow::CreateActions()
 	connect(action_bilateral_mesh_denoising_, SIGNAL(triggered()), this, SLOT(ShowBilateralMeshDenoisingWidget()));
 
 	action_scan_path_plan_ = new QAction(tr("Scan Path Plan"), this);
-	action_scan_path_plan_->setStatusTip("Scan Path Plan.");
+	action_scan_path_plan_->setStatusTip("Spp -- Scan Path Plan.");
 	connect(action_scan_path_plan_, SIGNAL(triggered()), this, SLOT(ShowScanPathPlanWidget()));////add for SPP,2.23.2017
 
 	action_non_iterative_feature_preserving_mesh_filtering_ = new QAction(tr("Non-Iterative, Feature Preserving Mesh Filtering"), this);
@@ -168,6 +179,10 @@ void MainWindow::CreateActions()
 	action_guided_mesh_normal_filtering_ = new QAction(tr("Guided Mesh Normal Filtering"), this);
 	action_guided_mesh_normal_filtering_->setStatusTip("Denoise Mesh using Algorithm -- Guided Mesh Normal Filtering.");
 	connect(action_guided_mesh_normal_filtering_, SIGNAL(triggered()), this, SLOT(ShowGuidedMeshNormalFilteringWidget()));
+
+	action_show_single_layer_ = new QAction(tr("Show single layer"), this);//add 3.13.2017
+	action_show_single_layer_->setStatusTip("SPP -- Show a specific layer of the sliced model");
+	connect(action_show_single_layer_, SIGNAL(triggered()), this, SLOT(ShowSingleLayer()));
 
 	action_about_ = new QAction(QIcon(":/Icons/about.ico"), tr("About"), this);
 	action_about_->setStatusTip("Information about this UI.");
@@ -194,6 +209,11 @@ void MainWindow::CreateMenus()
 	menu_algorithms_->addSeparator();
 	menu_algorithms_->addAction(action_scan_path_plan_);//add for SPP 2.23.2017
 	menu_algorithms_->setEnabled(false);
+
+	menu_view_ = menuBar()->addMenu(tr("View"));//add 3.13.2017
+	menu_view_->addAction(action_show_single_layer_);
+	menu_view_->setEnabled(false);
+
 	menu_help_ = menuBar()->addMenu(tr("Help"));
 	menu_help_->addAction(action_about_);
 }
@@ -210,6 +230,8 @@ void MainWindow::CreateToolBars()
 	toolbar_opengl_info_->addAction(action_render_faces_);
 	toolbar_opengl_info_->addAction(action_render_layers_);//add for layers 3-8-2017
 	toolbar_opengl_info_->addAction(action_render_hexagonal_subareas_);//add for hexagonal subareas 3-8-2017
+	toolbar_opengl_info_->addAction(action_render_intervals_);//add for intervals 3-14-2017
+	toolbar_opengl_info_->addAction(action_render_parallel_hatches_);//add for parallel hatches 3-15-2017
 	toolbar_opengl_info_->addSeparator();
 	toolbar_opengl_info_->addAction(action_set_background_color_);
 
@@ -257,7 +279,7 @@ void MainWindow::SetActionStatus(bool value)
 	action_export_mesh_->setEnabled(value);
 
 	menu_algorithms_->setEnabled(value);
-
+	menu_view_->setEnabled(value);///add 3.13.2017
 	toolbar_mesh_status_->setEnabled(value);
 }
 
@@ -396,6 +418,16 @@ void MainWindow::needToUpdateGL(bool value)
 {
 	opengl_viewer_->resetMesh(data_manager_->getMesh(), value);
 	opengl_viewer_->updateGL();
+}
+
+void MainWindow::ShowSingleLayer()//add  3.13.2017
+{
+	bool judge;
+	int num = QInputDialog::getInt(this, tr("Show the layer"), tr("Input the layer's number"), QLineEdit::Normal, 0, 1000, 1, &judge);
+	if (judge)
+	{
+		opengl_viewer_->examiner_->setShowSingleLayerNumber(num);
+	}
 }
 
 void MainWindow::About()

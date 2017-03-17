@@ -156,6 +156,9 @@
     <ClCompile Include="Clipper\clipper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GetHexagonHatches.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithms\BilateralMeshDenoising.h">
@@ -227,6 +230,9 @@
     <ClInclude Include="GetHexagonalSubarea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GetHexagonHatches.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mainwindow.ui">
@@ -264,6 +270,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icons\layers.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="hexagon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="interval.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -1,10 +1,12 @@
+
 #include "meshexaminer.h"
 #include "glwrapper.h"
 #include <QFileDialog>
 #include <QString>
 
 MeshExaminer::MeshExaminer()
-:draw_points_status_(false), draw_edges_status_(false), draw_faces_status_(true), draw_layers_status_(false), draw_hexagons_status_(false)
+:draw_points_status_(false), draw_edges_status_(false), draw_faces_status_(true), draw_layers_status_(false), 
+draw_hexagons_status_(false),draw_intervals_status_(false),draw_parallel_hatches_status_(false), show_single_layer_number_(-1)
 {
 
 }
@@ -138,7 +140,8 @@ void MeshExaminer::draw()
 
 	if (draw_hexagons_status_)
 	{
-		for (auto mesh_segmented_slicing_it = mesh_show_.mesh_segmented_slicing.begin(); mesh_segmented_slicing_it != mesh_show_.mesh_segmented_slicing.end();
+		for (auto mesh_segmented_slicing_it = mesh_show_.mesh_segmented_slicing.begin(); 
+	        mesh_segmented_slicing_it != mesh_show_.mesh_segmented_slicing.end();
 			mesh_segmented_slicing_it++)
 		{
 			TriMesh::SegmentedLayers segmented_layers = *mesh_segmented_slicing_it;
@@ -157,6 +160,142 @@ void MeshExaminer::draw()
 				}
 				glEnd();
 
+			}
+		}
+	}
+
+	if (show_single_layer_number_)
+	{
+		for (int j = 0 ; j < mesh_show_.mesh_segmented_slicing.size();j++)
+			//draw one layer's hexagonal subareas
+		{
+			if (j==show_single_layer_number_-1)
+			{
+			 TriMesh::SegmentedLayers segmented_layers = mesh_show_.mesh_segmented_slicing[j];
+			 for (int i = 0; i < segmented_layers.size();i++)
+			   {
+			    	TriMesh::Subareas layer_subarea = segmented_layers[i];
+				    glLineWidth(2);
+				    glBegin(GL_LINE_LOOP);
+				  for (auto layer_subarea_it = layer_subarea.begin(); layer_subarea_it != layer_subarea.end(); layer_subarea_it++)
+				   {
+					TriMesh::Point p = *layer_subarea_it;
+					glColor3f(0.3f, 0.3f, 0.3f);
+					glVertex3f(p[0], p[1], p[2]);
+			       }
+				 glEnd();
+			  }
+			}
+		}	
+
+		for (int i = 0; i < mesh_show_.mesh_slicing_.size();i++)
+			//draw  one layer's contours
+		{
+			if (i==show_single_layer_number_-1)
+			{
+			TriMesh::Contours z_contours = mesh_show_.mesh_slicing_[i];
+			for (auto contours_iterator = z_contours.begin(); contours_iterator != z_contours.end(); contours_iterator++)
+			for (int j = 0; j < z_contours.size();j++)
+			{
+				TriMesh::Polylines z_polyline = z_contours[j];
+				glLineWidth(3);
+				glBegin(GL_LINE_LOOP);
+				for (auto polyline_iterator = z_polyline.begin(); polyline_iterator != z_polyline.end(); polyline_iterator++)
+				{
+					TriMesh::Point p = *polyline_iterator;
+
+					glColor3f(1.0f, 0.0f, 0.0f);
+					glVertex3f(p[0], p[1], p[2]);
+				}
+				glEnd();
+			}
+			}
+		}
+
+		for (int i = 0; i < mesh_show_.mesh_hexagon_hatches_double_.size();i++)
+			//draw one layer's hexagonal subareas hatches
+		{
+			if (i == show_single_layer_number_ - 1)
+			{
+				TriMesh::HatchesForOneLayer hatches_of_a_layer = mesh_show_.mesh_hexagon_hatches_double_[i];
+				//double incerment_line_color = 0.000001;
+				for (auto hatches_of_a_layer_it_ = hatches_of_a_layer.begin();
+					hatches_of_a_layer_it_ != hatches_of_a_layer.end();
+					hatches_of_a_layer_it_++)
+				{
+					TriMesh::HatchesForOneHexagonSubarea hatches_of_a_subarea = *hatches_of_a_layer_it_;
+					//double increment_line_width = 0.4;
+					for (auto hatches_of_a_subarea_it_ = hatches_of_a_subarea.begin();
+						hatches_of_a_subarea_it_ != hatches_of_a_subarea.end();
+						hatches_of_a_subarea_it_++)
+					{
+						TriMesh::Segment seg = *hatches_of_a_subarea_it_;
+						TriMesh::Point start_pt = seg[0];
+						TriMesh::Point end_pt = seg[1];
+						//glLineWidth(increment_line_width+=increment_line_width);
+						glBegin(GL_LINES);
+						//glColor3f(incerment_line_color, incerment_line_color, incerment_line_color);
+						glColor3f(0.0f, 0.0f, 0.8f);
+						glVertex3f(start_pt[0], start_pt[1], start_pt[2]);
+						glVertex3f(end_pt[0], end_pt[1], end_pt[2]);
+						glEnd();
+					}
+					//incerment_line_color += incerment_line_color;
+				}
+			}
+		}
+	}
+
+	if (draw_intervals_status_)
+	{
+		for (auto mesh_between_segmented_slicing_it = mesh_show_.mesh_between_segmented_slicing_.begin();
+			mesh_between_segmented_slicing_it != mesh_show_.mesh_between_segmented_slicing_.end();
+			mesh_between_segmented_slicing_it++)
+		{
+			TriMesh::BetweenSegmentedLayers between_segmented_layers_ = *mesh_between_segmented_slicing_it;
+			for (auto between_segmented_layers_it_ = between_segmented_layers_.begin();
+				between_segmented_layers_it_ != between_segmented_layers_.end();
+				between_segmented_layers_it_++)
+			{
+				TriMesh::BetweenSubareas between_layer_subareas_ = *between_segmented_layers_it_;
+				glLineWidth(3);
+				glBegin(GL_LINE_LOOP);
+				for (auto between_layer_subarea_it = between_layer_subareas_.begin(); between_layer_subarea_it != between_layer_subareas_.end(); between_layer_subarea_it++)
+				{
+					TriMesh::Point p = *between_layer_subarea_it;
+					glColor3f(0.0f, 1.0f, 0.0f);
+					glVertex3f(p[0], p[1], p[2]);
+				}
+				glEnd();
+			}
+		}	
+	}
+
+	if (draw_parallel_hatches_status_)
+	{
+		for (auto mesh_hexagon_hatches_double_it_ = mesh_show_.mesh_hexagon_hatches_double_.begin();
+			mesh_hexagon_hatches_double_it_ != mesh_show_.mesh_hexagon_hatches_double_.end();
+			mesh_hexagon_hatches_double_it_++)
+		{
+			TriMesh::HatchesForOneLayer hatches_of_a_layer = *mesh_hexagon_hatches_double_it_;
+			for (auto hatches_of_a_layer_it_ = hatches_of_a_layer.begin();
+				hatches_of_a_layer_it_ != hatches_of_a_layer.end();
+				hatches_of_a_layer_it_++)
+			{
+				TriMesh::HatchesForOneHexagonSubarea hatches_of_a_subarea = *hatches_of_a_layer_it_;
+				for (auto hatches_of_a_subarea_it_ = hatches_of_a_subarea.begin();
+					hatches_of_a_subarea_it_ != hatches_of_a_subarea.end();
+					hatches_of_a_subarea_it_++)
+				{
+					TriMesh::Segment seg = *hatches_of_a_subarea_it_;
+					TriMesh::Point start_pt = seg[0];
+					TriMesh::Point end_pt = seg[1];
+					glBegin(GL_LINES);
+					glColor3f(0.0f, 0.0f, 0.8f);
+					glVertex3f(start_pt[0], start_pt[1], start_pt[2]);
+					glVertex3f(end_pt[0], end_pt[1], end_pt[2]);
+					glEnd();
+				}
 			}
 		}
 	}
