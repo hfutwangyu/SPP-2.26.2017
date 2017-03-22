@@ -57,6 +57,11 @@ public slots:
 		this->updateGL();
 	}
 
+	void setDrawIntervalTrianglesHatchessStatus(bool _val){//add for triangles hatches of interval 3.21.2017
+		examiner_->setDrawIntervalTrianglesHatchessStatus(_val);
+		this->updateGL();
+	}
+
     void setBackgroundColor(){
         QColor color = QColorDialog::getColor(Qt::black, this, tr("Set Background Color!"));
         if(!color.isValid()) return;

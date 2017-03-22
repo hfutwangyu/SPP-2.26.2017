@@ -4,7 +4,8 @@
 #include "../Algorithms/MeshDenoisingBase.h"
 //#include "Slice.h"
 //#include "GetHexagonalSubarea.h"
-#include "GetHexagonHatches.h"
+//#include "GetHexagonHatches.h"
+#include "GetIntervalHatches.h"
 class ScanPathPlan : public MeshDenoisingBase
 {
 public:
@@ -18,6 +19,7 @@ private:
 public:
 	void transformMeshSegmentedSlicingfromCIntToDouble(TriMesh &mesh, Slice &slice_of_date_manager, GetHexagonalSubarea &get_mesh_hexagonal_subarea_);
 	void transformHexagonaHatchesFromCIntToDouble(TriMesh &mesh, Slice &slice_of_date_manager, GetHexagonalSubarea &get_mesh_hexagonal_subarea_);
+	void transformIntervalsHatchesFromCIntToDouble(TriMesh &mesh, Slice &slice_of_date_manager, GetHexagonalSubarea &get_mesh_hexagonal_subarea_);
 };
 
 #endif // SCANPATHPLAN_H

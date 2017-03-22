@@ -168,6 +168,7 @@
     <ClCompile Include="glexaminer.cpp" />
     <ClCompile Include="glviewer.cpp" />
     <ClCompile Include="GetHexagonalSubarea.cpp" />
+    <ClCompile Include="GetIntervalHatches.cpp" />
     <ClCompile Include="iothread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mainwindow.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="Algorithms\NonIterativeFeaturePreservingMeshFiltering.h" />
     <ClInclude Include="GetHexagonalSubarea.h" />
     <ClInclude Include="GetHexagonHatches.h" />
+    <ClInclude Include="GetIntervalHatches.h" />
     <ClInclude Include="ScanPathPlan.h" />
     <ClInclude Include="Slice.h" />
     <CustomBuild Include="calculationthread.h">

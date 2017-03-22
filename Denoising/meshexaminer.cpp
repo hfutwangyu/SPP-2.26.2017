@@ -6,7 +6,8 @@
 
 MeshExaminer::MeshExaminer()
 :draw_points_status_(false), draw_edges_status_(false), draw_faces_status_(true), draw_layers_status_(false), 
-draw_hexagons_status_(false),draw_intervals_status_(false),draw_parallel_hatches_status_(false), show_single_layer_number_(-1)
+draw_hexagons_status_(false),draw_intervals_status_(false),draw_parallel_hatches_status_(false), show_single_layer_number_(-1),
+draw_interval_triangles_hatches_status_(false)
 {
 
 }
@@ -244,6 +245,28 @@ void MeshExaminer::draw()
 				}
 			}
 		}
+
+		for (int i = 0;i <mesh_show_.mesh_interval_hatches_double_.size();i++)
+			//show one layer's interval hatches
+		{
+			if (i == show_single_layer_number_ - 1)
+			{
+			TriMesh::HatchesForOneLayersInterval interval_hatches_of_a_layer_ = mesh_show_.mesh_interval_hatches_double_[i];
+			for (auto interval_hatches_of_a_layer_it_ = interval_hatches_of_a_layer_.begin();
+				interval_hatches_of_a_layer_it_ != interval_hatches_of_a_layer_.end();
+				interval_hatches_of_a_layer_it_++)
+			 {
+				TriMesh::Segment seg = *interval_hatches_of_a_layer_it_;
+				TriMesh::Point start_pt = seg[0];
+				TriMesh::Point end_pt = seg[1];
+				glBegin(GL_LINES);
+				glColor3f(0.0f, 0.8f, 0.8f);
+				glVertex3f(start_pt[0], start_pt[1], start_pt[2]);
+				glVertex3f(end_pt[0], end_pt[1], end_pt[2]);
+				glEnd();
+			 }
+			}
+		}
 	}
 
 	if (draw_intervals_status_)
@@ -296,6 +319,29 @@ void MeshExaminer::draw()
 					glVertex3f(end_pt[0], end_pt[1], end_pt[2]);
 					glEnd();
 				}
+			}
+		}
+	}
+
+	if (draw_interval_triangles_hatches_status_)
+	{
+		for (auto mesh_interval_hatches_double_it_ = mesh_show_.mesh_interval_hatches_double_.begin();
+			mesh_interval_hatches_double_it_ != mesh_show_.mesh_interval_hatches_double_.end();
+			mesh_interval_hatches_double_it_++)
+		{
+			TriMesh::HatchesForOneLayersInterval interval_hatches_of_a_layer_ = *mesh_interval_hatches_double_it_;
+			for (auto interval_hatches_of_a_layer_it_ = interval_hatches_of_a_layer_.begin();
+				interval_hatches_of_a_layer_it_ != interval_hatches_of_a_layer_.end();
+				interval_hatches_of_a_layer_it_++)
+			{
+				TriMesh::Segment seg = *interval_hatches_of_a_layer_it_;
+				TriMesh::Point start_pt = seg[0];
+				TriMesh::Point end_pt = seg[1];
+				glBegin(GL_LINES);
+				glColor3f(0.0f, 0.8f, 0.8f);
+				glVertex3f(start_pt[0], start_pt[1], start_pt[2]);
+				glVertex3f(end_pt[0], end_pt[1], end_pt[2]);
+				glEnd();
 			}
 		}
 	}

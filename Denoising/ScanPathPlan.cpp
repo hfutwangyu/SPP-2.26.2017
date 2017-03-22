@@ -28,13 +28,19 @@ void ScanPathPlan::denoise()
 
 	GetHexagonHatches get_hexagon_hatches_;//get parallel line hatches of hexagonal subares
 	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_hexagon_hatches_.parallel_line_spacing);
-	get_hexagon_hatches_.getParallelLines(slice_of_date_manager.slicing, get_mesh_hexagonal_subarea_.scale);
+	get_hexagon_hatches_.getParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
 	get_hexagon_hatches_.getHexagonHatchesLines(mesh);
 	
+	GetIntervalHatches get_interval_hatches_;
+	parameter_set_->getValue(QString("Parallel Line Spacing of Intervals"), get_interval_hatches_.parallel_line_spacing);
+	get_interval_hatches_.get0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+	get_interval_hatches_.get60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+	get_interval_hatches_.get120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+	get_interval_hatches_.getIntervalHatchTriangles(mesh);
 
 	transformMeshSegmentedSlicingfromCIntToDouble(mesh,slice_of_date_manager,get_mesh_hexagonal_subarea_);//change the data type from CInt to double
     transformHexagonaHatchesFromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);
-
+	transformIntervalsHatchesFromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);
 	data_manager_->setMesh(mesh);
 	data_manager_->setDenoisedMesh(mesh);
 }
@@ -56,6 +62,8 @@ void ScanPathPlan::initParameters()
 	parameter_set_->addParameter(QString("Transformation ration between double data and cInt data"), 1000, QString("Scale ="), QString("Double data multiply scale to get cInt data."),
 		true, 1, 100000000000);
 	parameter_set_->addParameter(QString("Parallel Line Spacing of Hexagonal Subareas"), 0.03, QString("PLS of HS ="), QString("Parallel Line Spacing of Hexagonal Subareas"), 
+		true, 1.0e-9, 1.0e8);
+	parameter_set_->addParameter(QString("Parallel Line Spacing of Intervals"), 0.03, QString("PLS of Intervals ="), QString("Parallel Line Spacing of Intervals"),
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->setName(QString("SPP"));
 	parameter_set_->setLabel(QString("SPP"));
@@ -142,5 +150,36 @@ void ScanPathPlan::transformHexagonaHatchesFromCIntToDouble(TriMesh &mesh, Slice
 			hatches_of_a_layer.push_back(hatches_of_a_subarea);
 		}
 		mesh.mesh_hexagon_hatches_double_.push_back(hatches_of_a_layer);
+	}
+}
+
+
+void ScanPathPlan::transformIntervalsHatchesFromCIntToDouble(TriMesh &mesh, Slice &slice_of_date_manager, GetHexagonalSubarea &get_mesh_hexagonal_subarea_)
+{
+	for (int i = 0; i < mesh.mesh_interval_hatches_int_.size();i++)
+	{
+		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		std::vector<Paths> ps_layer = mesh.mesh_interval_hatches_int_[i];
+		TriMesh::HatchesForOneLayersInterval interval_hatches_of_a_layer;
+		for (int j = 0; j < ps_layer.size();j++)
+		{
+			Paths ps = ps_layer[j];
+			for (int k = 0; k < ps.size();k++)
+			{
+				Path p = ps[k];
+				TriMesh::Segment seg;
+				for (int n = 0; n < p.size(); n++)
+				{
+					IntPoint ipt = p[n];
+					TriMesh::Point pt;
+					pt[0] = (double)(ipt.X) / (get_mesh_hexagonal_subarea_.scale);
+					pt[1] = (double)(ipt.Y) / (get_mesh_hexagonal_subarea_.scale);
+					pt[2] = z;
+					seg.push_back(pt);
+				}
+				interval_hatches_of_a_layer.push_back(seg);
+			}
+		}
+		mesh.mesh_interval_hatches_double_.push_back(interval_hatches_of_a_layer);
 	}
 }

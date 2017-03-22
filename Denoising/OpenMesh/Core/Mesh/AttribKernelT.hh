@@ -131,7 +131,12 @@ namespace OpenMesh {
 
 		typedef std::vector<Point>                    BetweenSubareas;
 		typedef std::vector<BetweenSubareas>          BetweenSegmentedLayers;
-		typedef std::vector<BetweenSegmentedLayers>   BetweenSegmentedSlicing;//blank between hexagonal subareas
+		typedef std::vector<BetweenSegmentedLayers>   BetweenSegmentedSlicing;//intervals between hexagonal subareas
+
+		typedef std::vector<std::vector<Paths>>       IntervalHatchesInt;//interval hathches 
+		typedef std::vector<Segment>                  HatchesForOneLayersInterval;
+		typedef std::vector<HatchesForOneLayersInterval>  IntervalHatchesDouble;
+
 	public:
 
 		//-------------------------------------------------- constructor / destructor
@@ -803,10 +808,13 @@ namespace OpenMesh {
 		AreasBetweenHexagonsInt_Polytree mesh_areas_betweent_hexagons_int_polytree_; // clipper structure
 		AreasBetweenHexagonsInt_Paths mesh_areas_betweent_hexagons_int_paths_;
 		SegmentedSlicing mesh_segmented_slicing;// //segment layers into hexagonal subareas
-		BetweenSegmentedSlicing mesh_between_segmented_slicing_;//blank between hexagonal subareas
+		BetweenSegmentedSlicing mesh_between_segmented_slicing_;//intervals between hexagonal subareas
 
 		HexagonHatchesInt mesh_hexagon_hatches_int_;// parallel lines for hexagonal subarea hatches 3.15.2017
 		HexagonHatchesDouble mesh_hexagon_hatches_double_;
+
+		IntervalHatchesInt mesh_interval_hatches_int_;//interval hatches in three direction 3.20.2017
+		IntervalHatchesDouble mesh_interval_hatches_double_;
 	private:
 		//standard vertex properties
 		PointsPropertyHandle                      points_;

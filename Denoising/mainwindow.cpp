@@ -118,11 +118,15 @@ void MainWindow::CreateActions()
 	action_render_intervals_->setCheckable(true);
 	connect(action_render_intervals_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawIntervalsStatus(bool)));
 
-	action_render_parallel_hatches_ = new QAction(QIcon("ParallelHatches.ico"), tr("Render Parallel Hatches"), this);//add for parallel hatches 3.15.2017
-	action_render_parallel_hatches_->setStatusTip("Render Parallel hatches.");
-	action_render_parallel_hatches_->setCheckable(true);
-	connect(action_render_parallel_hatches_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawParallelHatchessStatus(bool)));
+	action_render_hexagonal_subareas_parallel_hatches_ = new QAction(QIcon("ParallelHatches.ico"), tr("Render Hexagonal Subareas Hatches"), this);//add for hexagonal subareas parallel hatches 3.15.2017
+	action_render_hexagonal_subareas_parallel_hatches_->setStatusTip("Render Parallel hatches.");
+	action_render_hexagonal_subareas_parallel_hatches_->setCheckable(true);
+	connect(action_render_hexagonal_subareas_parallel_hatches_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawParallelHatchessStatus(bool)));
 
+	action_render_interval_hatches_ = new QAction(QIcon("intervalHatches.ico"), tr("Render Interval Hatches"), this);//add for interval hatches 3.21.2017
+	action_render_interval_hatches_->setStatusTip("Render Interval hatches.");
+	action_render_interval_hatches_->setCheckable(true);
+	connect(action_render_interval_hatches_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawIntervalTrianglesHatchessStatus(bool)));
 
 	action_set_background_color_ = new QAction(QIcon(":/Icons/background.ico"), tr("Change Background Color"), this);
 	action_set_background_color_->setStatusTip("Change Background Color.");
@@ -231,7 +235,8 @@ void MainWindow::CreateToolBars()
 	toolbar_opengl_info_->addAction(action_render_layers_);//add for layers 3-8-2017
 	toolbar_opengl_info_->addAction(action_render_hexagonal_subareas_);//add for hexagonal subareas 3-8-2017
 	toolbar_opengl_info_->addAction(action_render_intervals_);//add for intervals 3-14-2017
-	toolbar_opengl_info_->addAction(action_render_parallel_hatches_);//add for parallel hatches 3-15-2017
+	toolbar_opengl_info_->addAction(action_render_hexagonal_subareas_parallel_hatches_);//add for hexagonal subareas parallel hatches 3-15-2017
+	toolbar_opengl_info_->addAction(action_render_interval_hatches_);//add for interval hatches 3-21-2017
 	toolbar_opengl_info_->addSeparator();
 	toolbar_opengl_info_->addAction(action_set_background_color_);
 

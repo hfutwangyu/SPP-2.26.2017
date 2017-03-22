@@ -91,7 +91,8 @@ private:
 	QAction *action_render_layers_;//add for layers 3-8-2017
 	QAction *action_render_hexagonal_subareas_;//add for hexagonal subareas 3-8-2017
 	QAction *action_render_intervals_;//add for intervals 3.14.2017
-	QAction *action_render_parallel_hatches_;//add for parallel hatches of hexagonal subareas 3.15.2017
+	QAction *action_render_hexagonal_subareas_parallel_hatches_;//add for parallel hatches of hexagonal subareas 3.15.2017
+	QAction *action_render_interval_hatches_;//add for interval hatches in triangles 3.21.2017
 	QAction *action_set_background_color_;
 
 	QAction *action_to_noisy_mesh_;
