@@ -150,17 +150,19 @@ void MeshExaminer::draw()
 				segmented_layers_it++)
 			{
 				TriMesh::Subareas layer_subarea = *segmented_layers_it;
-
-				glLineWidth(3);
-				glBegin(GL_LINE_LOOP);
-				for (auto layer_subarea_it = layer_subarea.begin(); layer_subarea_it != layer_subarea.end(); layer_subarea_it++)
+				for (auto subarea_contours_it_ = layer_subarea.begin(); subarea_contours_it_ != layer_subarea.end();subarea_contours_it_++)
 				{
-					TriMesh::Point p = *layer_subarea_it;
-					glColor3f(0.3f, 0.3f, 0.3f);
-					glVertex3f(p[0], p[1], p[2]);
+					TriMesh::Polylines subarea_contour_ = *subarea_contours_it_;
+					glLineWidth(3);
+					glBegin(GL_LINE_LOOP);
+					for (auto layer_subarea_it = subarea_contour_.begin(); layer_subarea_it != subarea_contour_.end(); layer_subarea_it++)
+					{
+						TriMesh::Point p = *layer_subarea_it;
+						glColor3f(0.3f, 0.3f, 0.3f);
+						glVertex3f(p[0], p[1], p[2]);
+					}
+					glEnd();
 				}
-				glEnd();
-
 			}
 		}
 	}
@@ -173,19 +175,24 @@ void MeshExaminer::draw()
 			if (j==show_single_layer_number_-1)
 			{
 			 TriMesh::SegmentedLayers segmented_layers = mesh_show_.mesh_segmented_slicing[j];
-			 for (int i = 0; i < segmented_layers.size();i++)
-			   {
-			    	TriMesh::Subareas layer_subarea = segmented_layers[i];
-				    glLineWidth(2);
-				    glBegin(GL_LINE_LOOP);
-				  for (auto layer_subarea_it = layer_subarea.begin(); layer_subarea_it != layer_subarea.end(); layer_subarea_it++)
-				   {
-					TriMesh::Point p = *layer_subarea_it;
-					glColor3f(0.3f, 0.3f, 0.3f);
-					glVertex3f(p[0], p[1], p[2]);
-			       }
-				 glEnd();
-			  }
+			 for (auto segmented_layers_it = segmented_layers.begin(); segmented_layers_it != segmented_layers.end();
+				 segmented_layers_it++)
+			 {
+				 TriMesh::Subareas layer_subarea = *segmented_layers_it;
+				 for (auto subarea_contours_it_ = layer_subarea.begin(); subarea_contours_it_ != layer_subarea.end(); subarea_contours_it_++)
+				 {
+					 TriMesh::Polylines subarea_contour_ = *subarea_contours_it_;
+					 glLineWidth(3);
+					 glBegin(GL_LINE_LOOP);
+					 for (auto layer_subarea_it = subarea_contour_.begin(); layer_subarea_it != subarea_contour_.end(); layer_subarea_it++)
+					 {
+						 TriMesh::Point p = *layer_subarea_it;
+						 glColor3f(0.3f, 0.3f, 0.3f);
+						 glVertex3f(p[0], p[1], p[2]);
+					 }
+					 glEnd();
+				 }
+			 }
 			}
 		}	
 

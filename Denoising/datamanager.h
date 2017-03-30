@@ -12,6 +12,7 @@ public:
 public:
     bool ImportMeshFromFile(std::string filename);
     bool ExportMeshToFile(std::string filename);
+	bool ExportCLIToFile(std::string filename, std::string first, std::string second, std::string third, std::string forth);//add for export CLI file 2.22.2017
 
     TriMesh getMesh() const {return mesh_;}
     TriMesh getNoisyMesh() const {return noisy_mesh_;}
@@ -38,6 +39,8 @@ private:
     TriMesh noisy_mesh_;
     TriMesh denoised_mesh_;
     TriMesh mesh_;
+public:
+	
 };
 
 #endif // DATAMANAGER_H

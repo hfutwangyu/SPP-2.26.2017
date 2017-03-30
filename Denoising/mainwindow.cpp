@@ -304,15 +304,40 @@ void MainWindow::ImportMesh()
 
 void MainWindow::ExportMesh()
 {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Export Mesh"), ".", tr(" OBJ File (*.obj);;OFF File (*.off);;PLY File (*.ply)"));
+	QString filename = QFileDialog::getSaveFileName(this, tr("Export Mesh"), ".", tr(" CLI FILE (*.cli);;OBJ File (*.obj);;OFF File (*.off);;PLY File (*.ply)"));
+	// add for CLI export 3.22.2017  
 
 	if (filename.isNull())
 	{
 		return;
 	}
 
-	io_thread_->setFileName(filename);
-	io_thread_->io_type_ = ioThread::kExport;
+	if (filename.endsWith(".cli"))
+	{
+		QStringList sequence_list;
+		sequence_list << tr("Subarea Hatches") << tr("Subarea Contour") << tr("Interval Hatches") << tr("Layer Contour");
+		//Second << tr("Subarea Contour") << tr("Interval Hatches") << tr("Layer Contour") << tr("Subarea Htaches");
+		//Third  << tr("Interval Hatches") << tr("Layer Contour")<< tr("Subarea Htaches") << tr("Subarea Contour");
+		//Forth  << tr("Layer Contour")<< tr("Subarea Htaches") << tr("Subarea Contour") << tr("Interval Hatches");
+		bool ok;
+		QString one = QInputDialog::getItem(this, tr("Set the sequence of export cli file."), tr("First"), sequence_list, 0, false, &ok);
+		QString two = QInputDialog::getItem(this, tr("Set the sequence of export cli file."), tr("Second"), sequence_list, 1, false, &ok);
+		QString three = QInputDialog::getItem(this, tr("Set the sequence of export cli file."), tr("Third"), sequence_list, 2, false, &ok);
+		QString four = QInputDialog::getItem(this, tr("Set the sequence of export cli file."), tr("Forth"), sequence_list, 3, false, &ok);
+
+		io_thread_->firsrt = one;
+		io_thread_->second = two;
+		io_thread_->third = three;
+		io_thread_->forth = four;
+
+		io_thread_->setFileName(filename);
+		io_thread_->io_type_ = ioThread::kExportCLI;
+	}
+	else
+	{
+		io_thread_->setFileName(filename);
+		io_thread_->io_type_ = ioThread::kExport;
+	}
 	io_thread_->start();
 }
 

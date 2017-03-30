@@ -44,20 +44,35 @@ void GetHexagonHatches::getHexagonHatchesLines(TriMesh &mesh)
 
 		Paths lines = parallel_lines_[i];
 		std::vector<Paths> layer_solution;
-		for (int j = 0; j < mesh.mesh_hexagoned_hexagons_int_paths_[i].size();j++)
-		{
-			Path p = mesh.mesh_hexagoned_hexagons_int_paths_[i][j];
+		
+	/*	
+		    Paths p = mesh.mesh_hexagoned_hexagons_int_paths_[i];
 			Clipper c;
 		    PolyTree solution;
 			c.AddPaths(lines, ptSubject, false);
-			c.AddPath(p, ptClip, true);
+			c.AddPaths(p, ptClip, true);
 			c.Execute(ctIntersection, solution, pftEvenOdd, pftEvenOdd);
 
 			Paths ps;
 			OpenPathsFromPolyTree(solution, ps);
 			layer_solution.push_back(ps);
+	*///get a layer's subareas' hatches through one intersection//
+		for (int j = 0; j < mesh.mesh_hexagoned_hexagons_int_paths_[i].size();j++)
+		{
+			Paths ps_ = mesh.mesh_hexagoned_hexagons_int_paths_[i][j];
+			Clipper c;
+			PolyTree solution;
+			c.AddPaths(lines, ptSubject, false);
+			c.AddPaths(ps_, ptClip, true);
+			c.Execute(ctIntersection, solution, pftEvenOdd, pftEvenOdd);
+
+			Paths ps;
+			OpenPathsFromPolyTree(solution, ps);
+			if (ps.size()!=0)
+			{
+				layer_solution.push_back(ps);
+			}
 		}
-		
 		mesh.mesh_hexagon_hatches_int_.push_back(layer_solution);
 	}
 }

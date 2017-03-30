@@ -114,12 +114,16 @@ namespace OpenMesh {
 		typedef std::vector<Point>                    Polylines;
 		typedef std::vector<Polylines>                Contours;
 		typedef std::vector<Contours>                 Slicing;
+
+		typedef std::vector<std::pair<int, Polylines>> OrientedContours;
+		typedef std::vector<OrientedContours>         OrienedSlicing;
+
 		// Define the data structure of hexagonal subarea  3.8.2017
 		typedef std::vector<PolyTree>                 HexagonedSubareasInt_Polytree;//clipper structure
 		typedef std::vector<PolyTree>                 AreasBetweenHexagonsInt_Polytree;///clipper structure
 		typedef std::vector<Paths>                    AreasBetweenHexagonsInt_Paths;///clipper structure
-		typedef std::vector<Paths>                    HexagonedSubareasInt_Paths; // clipper structure
-		typedef std::vector<Point>                    Subareas;
+		typedef std::vector<std::vector<Paths>>       HexagonedSubareasInt_Paths; // clipper structure
+		typedef std::vector<Polylines>                    Subareas;
 		typedef std::vector<Subareas>                 SegmentedLayers;
 		typedef std::vector<SegmentedLayers>          SegmentedSlicing;//segment layers into hexagonal subareas
 
@@ -136,6 +140,8 @@ namespace OpenMesh {
 		typedef std::vector<std::vector<Paths>>       IntervalHatchesInt;//interval hathches 
 		typedef std::vector<Segment>                  HatchesForOneLayersInterval;
 		typedef std::vector<HatchesForOneLayersInterval>  IntervalHatchesDouble;
+
+		typedef std::vector<double>                   Layers;//add for each layer position 3.22.2017
 
 	public:
 
@@ -802,10 +808,11 @@ namespace OpenMesh {
 		}
 		// Define public members of mesh 2.23.2017
 		Slicing mesh_slicing_;
+		OrienedSlicing mesh_oriented_slicing_;//3.22.2017
 		// Define public members of mesh 3.8.2017
-		HexagonedSubareasInt_Polytree mesh_hexagoned_subareas_int_polytree_; // clipper structure
+		//HexagonedSubareasInt_Polytree mesh_hexagoned_subareas_int_polytree_; // clipper structure
 		HexagonedSubareasInt_Paths mesh_hexagoned_hexagons_int_paths_; // clipper structure
-		AreasBetweenHexagonsInt_Polytree mesh_areas_betweent_hexagons_int_polytree_; // clipper structure
+		//AreasBetweenHexagonsInt_Polytree mesh_areas_betweent_hexagons_int_polytree_; // clipper structure
 		AreasBetweenHexagonsInt_Paths mesh_areas_betweent_hexagons_int_paths_;
 		SegmentedSlicing mesh_segmented_slicing;// //segment layers into hexagonal subareas
 		BetweenSegmentedSlicing mesh_between_segmented_slicing_;//intervals between hexagonal subareas
@@ -815,6 +822,8 @@ namespace OpenMesh {
 
 		IntervalHatchesInt mesh_interval_hatches_int_;//interval hatches in three direction 3.20.2017
 		IntervalHatchesDouble mesh_interval_hatches_double_;
+
+		Layers mesh_layers_;//add for each layer's position 3.22.2017
 	private:
 		//standard vertex properties
 		PointsPropertyHandle                      points_;

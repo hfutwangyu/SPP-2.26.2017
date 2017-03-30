@@ -99,25 +99,97 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 		int n_layers = layers_integer_.size();
 		for (int i = 0; i < n_layers; i++)
 		{
+			Paths hexagons = hexagons_in_layers_interger_[i];
 			Paths contours_integer = layers_integer_[i];
-			Paths hexagon = hexagons_in_layers_interger_[i];
-			Paths layer_solution_intersection_;
-			Clipper c_intersection;
-			c_intersection.AddPaths(contours_integer, ptSubject, true);
-			c_intersection.AddPaths(hexagon, ptClip, true);
-			c_intersection.Execute(ctIntersection, layer_solution_intersection_, pftEvenOdd, pftEvenOdd);//get subareas
+			std::vector<Paths> layer_solution_intersection_;
+			for (int j = 0; j < hexagons.size();j++)
+			{
+				Path hexagon = hexagons[j];
+				Paths a_hexagon_contours_intersection_solution_;
+				Clipper a_hexagon_contours_intersection_;
+				a_hexagon_contours_intersection_.AddPaths(contours_integer, ptSubject, true);
+				a_hexagon_contours_intersection_.AddPath(hexagon, ptClip, true);
+				a_hexagon_contours_intersection_.Execute(ctIntersection, a_hexagon_contours_intersection_solution_, pftEvenOdd, pftEvenOdd);
+
+				if (a_hexagon_contours_intersection_solution_.size()!=0)
+				{
+					layer_solution_intersection_.push_back(a_hexagon_contours_intersection_solution_);
+				}
+			}
 			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_intersection_);
 			
+			Paths a_layer_solution_intersection_;
+			Clipper c_intersection;
+			c_intersection.AddPaths(contours_integer, ptSubject, true);
+			c_intersection.AddPaths(hexagons, ptClip, true);
+			c_intersection.Execute(ctIntersection, a_layer_solution_intersection_, pftEvenOdd, pftEvenOdd);//get subareas
 			Paths layer_solution_difference_;
 			Clipper c_difference;
 			c_difference.AddPaths(contours_integer, ptSubject, true);
-			c_difference.AddPaths(layer_solution_intersection_, ptClip, true);
+			c_difference.AddPaths(a_layer_solution_intersection_, ptClip, true);
 			c_difference.Execute(ctDifference,layer_solution_difference_,pftEvenOdd,pftEvenOdd);///get intervals between hexagonal subareas
 			mesh.mesh_areas_betweent_hexagons_int_paths_.push_back(layer_solution_difference_);
 		}
 	}
 	else
 	{
-		exit(0);////
+		exit(1);////
 	}
+}
+
+
+void GetHexagonalSubarea::getLayerContoursOrientation(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
+{
+	if (slice_of_mesh_.size()==layers_integer_.size())
+	{
+		for (int i = 0; i < slice_of_mesh_.size(); i++)
+		{
+			double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+			TriMesh::Contours layer_contours = slice_of_mesh_[i];
+			getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+			//////////////////////////////////////////////////////////////////////////
+			//adjust the orientation of each layer contour
+			Path clip;
+			clip << IntPoint((min_x - 10.0)*scale, (min_y - 10.0)*scale) << IntPoint((min_x - 10.0)*scale, (min_y - 20.0)*scale)
+				<< IntPoint((min_x - 20.0)*scale, (min_y - 20.0)*scale) << IntPoint((min_x - 20.0)*scale, (min_y - 10.0)*scale);
+			Paths contours_integer = layers_integer_[i];
+			Clipper C;
+			Paths solution;
+			C.AddPaths(contours_integer, ptSubject, true);
+			C.AddPath(clip, ptClip, true);
+			C.Execute(ctDifference, solution, pftEvenOdd, pftEvenOdd);
+
+			//////////////////////////////////////////////////////////////////////////
+			//get the oriented slicing data 
+			TriMesh::OrientedContours oriented_layer_contours;
+			for (int j = 0; j < solution.size();j++)
+			{
+               std::pair<int, TriMesh::Polylines>  a_oriented_layer_contour;
+			   Path p = solution[j];
+			   //get the orientation
+			   if (Orientation(p))
+			   {
+				   a_oriented_layer_contour.first = 1;
+			   }
+			   else
+			   {
+				   a_oriented_layer_contour.first = 0;
+			   }
+			   //get the polylines
+			   for (int k = 0; k < p.size(); k++)
+			   {
+				   IntPoint int_pt = p[k];
+				   TriMesh::Point mesh_point;
+				   mesh_point[0] = (double)(int_pt.X) / scale;
+				   mesh_point[1] = (double)(int_pt.Y) / scale;
+				   mesh_point[2] = 0.0;
+				   a_oriented_layer_contour.second.push_back(mesh_point);
+			   }
+			   oriented_layer_contours.push_back(a_oriented_layer_contour);
+			}
+			mesh.mesh_oriented_slicing_.push_back(oriented_layer_contours);
+		}
+	}
+	else exit(1);
 }

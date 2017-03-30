@@ -39,10 +39,27 @@ void ioThread::ExportMesh(QString &file_name)
         emit(statusShowMessage("Writing mesh " + file_name + " successful."));
 }
 
+
+
+void ioThread::ExportCLI(QString &file_name)
+{
+	emit(statusShowMessage("Now writing CLI " + file_name + " ..."));
+	if (!data_manager_->ExportCLIToFile(file_name.toStdString(),firsrt.toStdString(),second.toStdString(),third.toStdString(),forth.toStdString()))
+	{
+		emit(statusShowMessage("Writing CLI " + file_name + " failed."));
+		return;
+	}
+	else
+		emit(statusShowMessage("Writing CLI " + file_name + " successful."));
+}
+
+
 void ioThread::run()
 {
     if(io_type_ == kImport)
         ImportMesh(file_name_);
-    else
-        ExportMesh(file_name_);
+	else if (io_type_ == kExport)
+		ExportMesh(file_name_);
+	else if (io_type_ == kExportCLI)
+		ExportCLI(file_name_);
 }
