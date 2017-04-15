@@ -45,9 +45,11 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 
 		double horizontal_x=0.0, vertical_y=0.0;
 		Paths hexagons;
-		for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= max_y; j++)
+		for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+			//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
 		{
-			for (int i = 0; (horizontal_x = min_x + (1.5*side_length_of_bounding_hexagon*i)) <= max_x; i++)
+			for (int i = 0; (horizontal_x = min_x + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)
+				//max_x + 1.5*side_length_of_bounding_hexagon revise large blank at the outside contour boundary 4.15.2017
 			{
 				if ((i%2 == 1 && j%2 == 1)||
 					(i%2 == 0 && j%2 == 0))//if both i and j are odd or even
