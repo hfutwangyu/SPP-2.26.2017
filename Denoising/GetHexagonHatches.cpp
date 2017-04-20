@@ -76,3 +76,76 @@ void GetHexagonHatches::getHexagonHatchesLines(TriMesh &mesh)
 		mesh.mesh_hexagon_hatches_int_.push_back(layer_solution);
 	}
 }
+
+
+void GetHexagonHatches::getTriangularParallelLinesBetweenLayers(TriMesh::Slicing &slice_of_mesh_, int &scale)
+// // triangular parallel hatches between adjoint 3 layers 4.17.2017
+{
+	int n_layers = slice_of_mesh_.size();
+	for (int i = 0; i < n_layers; i++)
+	{
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = slice_of_mesh_[i];
+		GetHexagonalSubarea get_mesh_hexagonal_subarea_;
+		get_mesh_hexagonal_subarea_.getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		int  j = i + 1;
+
+	    if (j % 2 == 0)// 60 degree parallel hatch lines 
+		{
+			double start_x = 0.0,
+				start_y = min_y - 1.0,
+				end_x = max_x,
+				end_y = max_y + (max_x - min_x)*sqrt(3.0);
+			Paths lines;
+			//for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*2.0*parallel_line_spacing / sqrt(3.0)) <= max_x;i++)
+			for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*parallel_line_spacing) <= max_x; end_x = max_x + i* parallel_line_spacing, i++)
+			{
+				//end_x = end_x + 2.0*parallel_line_spacing / sqrt(3.0);
+				//end_x = end_x + parallel_line_spacing ;
+				Path line;
+				line << IntPoint(start_x*scale, start_y*scale)
+					<< IntPoint(end_x*scale, end_y*scale);
+				lines << line;
+			}
+			parallel_lines_.push_back(lines);
+		} 
+		else if (j % 3 == 0) // 120 degree parallel hatch lines 
+		{
+			double //start_x = (max_y-min_y+1.0)/sqrt(3.0)+2*max_x-min_x,
+				start_x = 0.0,
+				start_y = min_y - 1.0,
+				end_x = max_x,
+				end_y = max_y + (max_x - min_x)*sqrt(3.0);
+			Paths lines;
+			//for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - 2.0*i*parallel_line_spacing / sqrt(3.0)) >= min_x; i++)
+			for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - i*parallel_line_spacing) >= min_x; end_x = max_x - i*parallel_line_spacing, i++)
+			{
+				//end_x = end_x - 2.0*parallel_line_spacing / sqrt(3.0);
+				//end_x = end_x - parallel_line_spacing;
+				Path line;
+				line << IntPoint(start_x*scale, start_y*scale)
+					<< IntPoint(end_x*scale, end_y*scale);
+				lines << line;
+			}
+			parallel_lines_.push_back(lines);
+		}
+		else if (j % 1 == 0) //0 degree parrallel hatch lines  
+		{
+			double horizontal_min = min_x - 1.0,
+				horizontal_max = max_x + 1.0,
+				vertical_y = 0.0,
+				vertical_min = min_y;
+			Paths lines;
+			//for (int i = 0; (vertical_y =  max_y + (max_x - min_x)*sqrt(3.0) - i*parallel_line_spacing) >= vertical_min; i++)
+			for (int i = 0; (vertical_y = max_y + (max_x - min_x)*sqrt(3.0) - i*sqrt(3.0)*parallel_line_spacing / 2.0) >= vertical_min; i++)
+			{
+				Path line;
+				line << IntPoint(horizontal_min*scale, vertical_y*scale)
+					<< IntPoint(horizontal_max*scale, vertical_y*scale);
+				lines << line;
+			}
+			parallel_lines_.push_back(lines);
+		}
+	}
+}

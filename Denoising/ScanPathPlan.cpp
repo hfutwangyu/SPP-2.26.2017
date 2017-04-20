@@ -31,7 +31,12 @@ void ScanPathPlan::denoise()
 
 	GetHexagonHatches get_hexagon_hatches_;//get parallel line hatches of hexagonal subares
 	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_hexagon_hatches_.parallel_line_spacing);
+/*	
+    // undirectional hatches
 	get_hexagon_hatches_.getParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+*/
+	// triangular parallel hatches between adjoint 3 layers 4.17.2017
+	get_hexagon_hatches_.getTriangularParallelLinesBetweenLayers(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
 	get_hexagon_hatches_.getHexagonHatchesLines(mesh);
 	transformMeshSegmentedSlicingfromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
 	transformHexagonaHatchesFromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
