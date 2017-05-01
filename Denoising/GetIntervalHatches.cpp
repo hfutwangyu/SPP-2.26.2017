@@ -25,10 +25,10 @@ void GetIntervalHatches::get60ParallelLines(TriMesh::Slicing &slice_of_mesh_, in
 	           end_x = max_x, 
 			   end_y = max_y+(max_x-min_x)*sqrt(3.0);
 		Paths lines;
-		//for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*2.0*parallel_line_spacing / sqrt(3.0)) <= max_x;i++)
-		for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*parallel_line_spacing) <= max_x; end_x = max_x + i* parallel_line_spacing, i++)
+		for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*2.0*parallel_line_spacing / sqrt(3.0)) <= max_x;i++)
+		//for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*parallel_line_spacing) <= max_x; end_x = max_x + i* parallel_line_spacing, i++)
 		{
-			//end_x = end_x + 2.0*parallel_line_spacing / sqrt(3.0);
+			end_x = max_x + i*2.0*parallel_line_spacing / sqrt(3.0);
 			//end_x = end_x + parallel_line_spacing ;
 			Path line;
 			line << IntPoint(start_x*scale, start_y*scale)
@@ -57,10 +57,10 @@ void GetIntervalHatches::get120ParallelLines(TriMesh::Slicing &slice_of_mesh_, i
 			   end_x = max_x,
 			   end_y = max_y + (max_x - min_x)*sqrt(3.0);
 		Paths lines;
-		//for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - 2.0*i*parallel_line_spacing / sqrt(3.0)) >= min_x; i++)
-		for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - i*parallel_line_spacing) >= min_x; end_x = max_x - i*parallel_line_spacing, i++)
+		for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - 2.0*i*parallel_line_spacing / sqrt(3.0)) >= min_x; i++)
+		//for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - i*parallel_line_spacing) >= min_x; end_x = max_x - i*parallel_line_spacing, i++)
 		{
-			//end_x = end_x - 2.0*parallel_line_spacing / sqrt(3.0);
+			end_x = max_x - i*2.0*parallel_line_spacing / sqrt(3.0);
 			//end_x = end_x - parallel_line_spacing;
 			Path line;
 			line << IntPoint(start_x*scale, start_y*scale)
@@ -85,8 +85,8 @@ void GetIntervalHatches::get0ParallelLines(TriMesh::Slicing &slice_of_mesh_, int
 			vertical_y = 0.0,
 			vertical_min = min_y;
 		Paths lines;
-		//for (int i = 0; (vertical_y =  max_y + (max_x - min_x)*sqrt(3.0) - i*parallel_line_spacing) >= vertical_min; i++)
-		for (int i = 0; (vertical_y = max_y + (max_x - min_x)*sqrt(3.0) - i*sqrt(3.0)*parallel_line_spacing/2.0) >= vertical_min; i++)
+		for (int i = 0; (vertical_y =  max_y + (max_x - min_x)*sqrt(3.0) - i*parallel_line_spacing) >= vertical_min; i++)
+		//for (int i = 0; (vertical_y = max_y + (max_x - min_x)*sqrt(3.0) - i*sqrt(3.0)*parallel_line_spacing/2.0) >= vertical_min; i++)
 		{
 			Path line;
 			line << IntPoint(horizontal_min*scale, vertical_y*scale)

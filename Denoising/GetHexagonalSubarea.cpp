@@ -72,6 +72,72 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 }
 
 
+void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &slice_of_mesh_)
+//get hexagons starggered between layers 4.22.2017
+{
+	int n_layers = slice_of_mesh_.size();
+	for (int k = 0; k < n_layers; k++)
+	{
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = slice_of_mesh_[k];
+		getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		double horizontal_x = 0.0, vertical_y = 0.0;
+		Paths hexagons;
+		if (k%2==1)
+		{
+			for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+				//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
+			{
+				for (int i = 0; (horizontal_x = min_x + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)
+					//max_x + 1.5*side_length_of_bounding_hexagon revise large blank at the outside contour boundary 4.15.2017
+				{
+					if ((i % 2 == 1 && j % 2 == 1) ||
+						(i % 2 == 0 && j % 2 == 0))//if both i and j are odd or even
+					{
+
+						Path hexagon;
+						hexagon << IntPoint((horizontal_x + side_length_of_hexagon)*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y + 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
+							<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y + 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
+							<< IntPoint((horizontal_x - side_length_of_hexagon)*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
+							<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale);
+						hexagons << hexagon;
+					}
+				}
+			}
+		} 
+		else if (k%2==0)
+		{
+			for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+				//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
+			{
+				for (int i = 0; (horizontal_x = min_x +side_length_of_bounding_hexagon+ (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)
+					//max_x + 1.5*side_length_of_bounding_hexagon revise large blank at the outside contour boundary 4.15.2017
+				{
+					if ((i % 2 == 1 && j % 2 == 1) ||
+						(i % 2 == 0 && j % 2 == 0))//if both i and j are odd or even
+					{
+
+						Path hexagon;
+						hexagon << IntPoint((horizontal_x + side_length_of_hexagon)*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y + 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
+							<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y + 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
+							<< IntPoint((horizontal_x - side_length_of_hexagon)*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
+							<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale);
+						hexagons << hexagon;
+					}
+				}
+			}
+		}
+	
+
+		hexagons_in_layers_interger_.push_back(hexagons);
+	}
+}
+
 void GetHexagonalSubarea::getMaxAndMinXYofLayer(TriMesh::Contours &layer_contours, double &min_x, double &max_x, double &min_y, double &max_y)
 /////////////////get the max & min x&y in one layer 
 {
@@ -95,7 +161,8 @@ void GetHexagonalSubarea::getMaxAndMinXYofLayer(TriMesh::Contours &layer_contour
 void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
 {	
 	transformLayersDataTypeToInteger(slice_of_mesh_);
-	getHexagons(slice_of_mesh_);///////
+	//getHexagons(slice_of_mesh_);///////get hexagons in each layer
+	getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
 	if ((layers_integer_.size())==(hexagons_in_layers_interger_.size()))
 	{
 		int n_layers = layers_integer_.size();
@@ -195,3 +262,5 @@ void GetHexagonalSubarea::getLayerContoursOrientation(TriMesh &mesh, TriMesh::Sl
 	}
 	else exit(1);
 }
+
+
