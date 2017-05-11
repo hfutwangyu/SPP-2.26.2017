@@ -159,11 +159,11 @@ void GetHexagonalSubarea::getMaxAndMinXYofLayer(TriMesh::Contours &layer_contour
 
 
 void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
-{	
+{
 	transformLayersDataTypeToInteger(slice_of_mesh_);
 	//getHexagons(slice_of_mesh_);///////get hexagons in each layer
 	getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
-	if ((layers_integer_.size())==(hexagons_in_layers_interger_.size()))
+	if ((layers_integer_.size()) == (hexagons_in_layers_interger_.size()))
 	{
 		int n_layers = layers_integer_.size();
 		for (int i = 0; i < n_layers; i++)
@@ -171,7 +171,7 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 			Paths hexagons = hexagons_in_layers_interger_[i];
 			Paths contours_integer = layers_integer_[i];
 			std::vector<Paths> layer_solution_intersection_;
-			for (int j = 0; j < hexagons.size();j++)
+			for (int j = 0; j < hexagons.size(); j++)
 			{
 				Path hexagon = hexagons[j];
 				Paths a_hexagon_contours_intersection_solution_;
@@ -180,13 +180,13 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 				a_hexagon_contours_intersection_.AddPath(hexagon, ptClip, true);
 				a_hexagon_contours_intersection_.Execute(ctIntersection, a_hexagon_contours_intersection_solution_, pftEvenOdd, pftEvenOdd);
 
-				if (a_hexagon_contours_intersection_solution_.size()!=0)
+				if (a_hexagon_contours_intersection_solution_.size() != 0)
 				{
 					layer_solution_intersection_.push_back(a_hexagon_contours_intersection_solution_);
 				}
 			}
 			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_intersection_);
-			
+
 			Paths a_layer_solution_intersection_;
 			Clipper c_intersection;
 			c_intersection.AddPaths(contours_integer, ptSubject, true);
@@ -196,7 +196,7 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 			Clipper c_difference;
 			c_difference.AddPaths(contours_integer, ptSubject, true);
 			c_difference.AddPaths(a_layer_solution_intersection_, ptClip, true);
-			c_difference.Execute(ctDifference,layer_solution_difference_,pftEvenOdd,pftEvenOdd);///get intervals between hexagonal subareas
+			c_difference.Execute(ctDifference, layer_solution_difference_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
 			mesh.mesh_areas_betweent_hexagons_int_paths_.push_back(layer_solution_difference_);
 		}
 	}
@@ -264,3 +264,257 @@ void GetHexagonalSubarea::getLayerContoursOrientation(TriMesh &mesh, TriMesh::Sl
 }
 
 
+
+
+void GetHexagonalSubarea::getOuterContoursofEachLayer(TriMesh::Slicing &slice_of_mesh_)
+{
+	for (int i = 0; i < layers_integer_.size();i++)
+	{
+		Paths contours_integer = layers_integer_[i];
+		Paths outer_contours_of_a_alyer_;
+
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = slice_of_mesh_[i];
+		getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		//////////////////////////////////////////////////////////////////////////
+		Path clip;
+		clip << IntPoint((min_x - 10.0)*scale, (min_y - 10.0)*scale) << IntPoint((min_x - 10.0)*scale, (min_y - 20.0)*scale)
+			<< IntPoint((min_x - 20.0)*scale, (min_y - 20.0)*scale) << IntPoint((min_x - 20.0)*scale, (min_y - 10.0)*scale);
+		Clipper C;
+		PolyTree solution;
+		C.AddPaths(contours_integer, ptSubject, true);
+		C.AddPath(clip, ptClip, true);
+		C.Execute(ctDifference, solution, pftEvenOdd, pftEvenOdd);
+
+		int n = solution.ChildCount();
+		for (int j = 0; j < n;j++)
+		{
+			outer_contours_of_a_alyer_.push_back(solution.Childs[j]->Contour);
+		}
+
+		layer_outer_contours_.push_back(outer_contours_of_a_alyer_);
+	}
+}
+
+
+void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
+{
+	transformLayersDataTypeToInteger(slice_of_mesh_);
+	//getHexagons(slice_of_mesh_);///////get hexagons in each layer
+	getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
+	//5.1.2017
+	//getOuterContoursofEachLayer(slice_of_mesh_);
+
+	//getOffsettedOuterContours(slice_of_mesh_);//5.2.2017
+	OffsetForAllLayerContours(slice_of_mesh_);//5,4,2017
+
+	if ((layers_integer_.size()) == (hexagons_in_layers_interger_.size()) &&
+		//(layers_integer_.size()) == (layer_outer_contours_.size()))
+		(layers_integer_.size()) == (offsetted_layers_integer_.size()))
+	{
+		int n_layers = layers_integer_.size();
+		for (int i = 0; i < n_layers; i++)
+		{
+			Paths hexagons = hexagons_in_layers_interger_[i];
+			//Paths contours_integer = layers_integer_[i];
+			Paths offsetted_contours_integer = offsetted_layers_integer_[i];
+	/*		////////////////////////////////////
+			//offset each layer's outer contours 5.1.2017 
+			Paths outer_contours_of_a_alyer_ = layer_outer_contours_[i];
+			for (int k = 0; k < contours_integer.size(); k++)
+			{
+				Path contour = contours_integer[k];
+				IntPoint spt = contour.front(),
+					ept = contour.back();
+
+				for (int l = 0; l < outer_contours_of_a_alyer_.size(); l++)
+				{
+					Path one_outer_contour_of_a_alyer_ = outer_contours_of_a_alyer_[l];
+					IntPoint start_pt = one_outer_contour_of_a_alyer_.front(),
+						end_pt = one_outer_contour_of_a_alyer_.back();
+
+					if ((one_outer_contour_of_a_alyer_.size() == contour.size()) &&
+						(sqrt(pow((spt.X - start_pt.X), 2) + pow((spt.Y - start_pt.Y), 2)) < 1.0e-9*scale) &&
+						(sqrt(pow((ept.X - end_pt.X), 2) + pow((ept.Y - end_pt.Y), 2)) < 1.0e-9*scale))
+					{
+						Paths solution;
+						ClipperOffset co;
+						co.AddPath(contour, jtMiter, etClosedPolygon);
+						co.Execute(solution, -2.0*scale);
+
+						Path offsetted_outer_contour_;
+						if (solution.size() == 1)
+						{
+							offsetted_outer_contour_ = solution[0];
+						}
+						contours_integer[k].swap(offsetted_outer_contour_);
+					}
+				}
+			}
+			/////////////////////////////////////
+   */
+			std::vector<Paths> layer_solution_intersection_;
+			for (int j = 0; j < hexagons.size(); j++)
+			{
+				Path hexagon = hexagons[j];
+				Paths a_hexagon_contours_intersection_solution_;
+				Clipper a_hexagon_contours_intersection_;
+				//a_hexagon_contours_intersection_.AddPaths(contours_integer, ptSubject, true);
+				a_hexagon_contours_intersection_.AddPaths(offsetted_contours_integer, ptSubject, true);
+				a_hexagon_contours_intersection_.AddPath(hexagon, ptClip, true);
+				a_hexagon_contours_intersection_.Execute(ctIntersection, a_hexagon_contours_intersection_solution_, pftEvenOdd, pftEvenOdd);
+
+				if (a_hexagon_contours_intersection_solution_.size() != 0)
+				{
+					layer_solution_intersection_.push_back(a_hexagon_contours_intersection_solution_);
+				}
+			}
+			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_intersection_);
+
+			Paths a_layer_solution_intersection_;
+			Clipper c_intersection;
+			//c_intersection.AddPaths(contours_integer, ptSubject, true);
+			c_intersection.AddPaths(offsetted_contours_integer, ptSubject, true);
+			c_intersection.AddPaths(hexagons, ptClip, true);
+			c_intersection.Execute(ctIntersection, a_layer_solution_intersection_, pftEvenOdd, pftEvenOdd);//get subareas
+			Paths layer_solution_difference_;
+			Clipper c_difference;
+			Paths contours_integer = layers_integer_[i];///
+			c_difference.AddPaths(contours_integer, ptSubject, true);
+			c_difference.AddPaths(a_layer_solution_intersection_, ptClip, true);
+			c_difference.Execute(ctDifference, layer_solution_difference_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+			mesh.mesh_areas_betweent_hexagons_int_paths_.push_back(layer_solution_difference_);
+		}
+	}
+	else
+	{
+		exit(1);////
+	}
+}
+
+
+void GetHexagonalSubarea::getOffsettedOuterContours(TriMesh::Slicing &slice_of_mesh_)
+{
+	getOuterContoursofEachLayer(slice_of_mesh_);
+
+	offsetted_layers_integer_=layers_integer_;
+
+	if (slice_of_mesh_.size() == offsetted_layers_integer_.size())///adjust data of layers integer 5.2.2017
+	{
+		for (int i = 0; i < slice_of_mesh_.size(); i++)
+		{
+			double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+			TriMesh::Contours layer_contours = slice_of_mesh_[i];
+			getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+			//////////////////////////////////////////////////////////////////////////
+			//adjust the orientation of each layer contour
+			Path clip;
+			clip << IntPoint((min_x - 10.0)*scale, (min_y - 10.0)*scale) << IntPoint((min_x - 10.0)*scale, (min_y - 20.0)*scale)
+				<< IntPoint((min_x - 20.0)*scale, (min_y - 20.0)*scale) << IntPoint((min_x - 20.0)*scale, (min_y - 10.0)*scale);
+			Paths contours_integer = offsetted_layers_integer_[i];
+			Clipper C;
+			Paths lc;
+			C.AddPaths(contours_integer, ptSubject, true);
+			C.AddPath(clip, ptClip, true);
+			C.Execute(ctDifference, lc, pftEvenOdd, pftEvenOdd);
+
+
+
+			////////////////////////////////////
+			//offset each layer's outer contours 5.1.2017 
+			Paths outer_contours_of_a_alyer_ = layer_outer_contours_[i];
+			for (int k = 0; k < lc.size(); k++)
+			{
+				Path contour = lc[k];
+				IntPoint spt = contour.front(),
+					ept = contour.back();
+
+				for (int l = 0; l < outer_contours_of_a_alyer_.size(); l++)
+				{
+					Path one_outer_contour_of_a_alyer_ = outer_contours_of_a_alyer_[l];
+					IntPoint start_pt = one_outer_contour_of_a_alyer_.front(),
+						end_pt = one_outer_contour_of_a_alyer_.back();
+
+					if ((one_outer_contour_of_a_alyer_.size() == contour.size()) &&
+						(sqrt(pow((spt.X - start_pt.X), 2) + pow((spt.Y - start_pt.Y), 2)) < 1.0e-9*scale) &&
+						(sqrt(pow((ept.X - end_pt.X), 2) + pow((ept.Y - end_pt.Y), 2)) < 1.0e-9*scale))
+					{
+						Paths solution;
+						ClipperOffset co;
+						co.AddPath(contour, jtMiter, etClosedPolygon);
+						co.Execute(solution, (0.0-offset)*scale);
+
+						Path offsetted_outer_contour_;
+						if (solution.size() == 1)
+						{
+							offsetted_outer_contour_ = solution[0];
+						}
+						lc[k].swap(offsetted_outer_contour_);
+					}
+				}
+			}
+
+			offsetted_layers_integer_[i].swap(lc);
+			/////////////////////////////////////
+
+		}
+	}
+	else exit(1);
+}
+
+
+void GetHexagonalSubarea::OffsetForAllLayerContours(TriMesh::Slicing &slice_of_mesh_)
+{
+	for (int i = 0; i < slice_of_mesh_.size(); i++)
+	{
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = slice_of_mesh_[i];
+		getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		//////////////////////////////////////////////////////////////////////////
+		//adjust the orientation of each layer contour
+		Path clip;
+		clip << IntPoint((min_x - 10.0)*scale, (min_y - 10.0)*scale) << IntPoint((min_x - 10.0)*scale, (min_y - 20.0)*scale)
+			<< IntPoint((min_x - 20.0)*scale, (min_y - 20.0)*scale) << IntPoint((min_x - 20.0)*scale, (min_y - 10.0)*scale);
+		Paths contours_integer = layers_integer_[i];
+		Clipper C;
+		Paths solution;
+		C.AddPaths(contours_integer, ptSubject, true);
+		C.AddPath(clip, ptClip, true);
+		C.Execute(ctDifference, solution, pftEvenOdd, pftEvenOdd);
+
+		////////////////////////////////////
+		//offset each layer's  contours 5.4.2017 
+		Paths offseted_a_layer_contours_;
+		for (int j = 0; j < solution.size();j++)
+		{
+			Paths offseted_a_layer_contour_;
+			Path p = solution[j];
+
+			if (Orientation(p))// offset
+			{
+				ClipperOffset co;
+				co.AddPath(p, jtMiter, etClosedPolygon);
+				co.Execute(offseted_a_layer_contour_, (0.0 - offset)*scale);
+			} 
+			else
+			{
+				ClipperOffset co;
+				co.AddPath(p, jtMiter, etClosedPolygon);
+				co.Execute(offseted_a_layer_contour_,  offset*scale);
+			}
+
+
+			for (int k = 0; k < offseted_a_layer_contour_.size();k++)
+				//storage offseted layer contour one by one
+			{
+				Path offsetted_contour_ = offseted_a_layer_contour_[k];
+				offseted_a_layer_contours_.push_back(offsetted_contour_);
+			}
+		}
+
+		offsetted_layers_integer_.push_back(offseted_a_layer_contours_);
+	}
+}

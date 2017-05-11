@@ -18,13 +18,26 @@ public:
     void segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_);
 	void getLayerContoursOrientation(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_);
 
+	void getOuterContoursofEachLayer(TriMesh::Slicing &slice_of_mesh_);
+	void segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_);//only offseted outer contour 5.2.2017
+    void getOffsettedOuterContours(TriMesh::Slicing &slice_of_mesh_);//5.2.2017
+   
+	void OffsetForAllLayerContours(TriMesh::Slicing &slice_of_mesh_);//5.4.2017 make all layers' contours OFFSETTED 
+
 public:
 	std::vector<Paths> hexagons_in_layers_interger_;
 	std::vector<Paths> layers_integer_;
+	std::vector<Paths> offsetted_layers_integer_;
+
+	std::vector<Paths> layer_outer_contours_;
 
 	double side_length_of_bounding_hexagon=4.0;
 	double side_length_of_hexagon=3.0;
     int scale = 10000;
+	double offset=0.1;
+
+
+	
 	
 };
 

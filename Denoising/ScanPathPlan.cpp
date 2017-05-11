@@ -24,7 +24,9 @@ void ScanPathPlan::denoise()
 	parameter_set_->getValue(QString("Side Length of Rounding hexagon"), get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 	parameter_set_->getValue(QString("Side Length of hexagonal subarea"), get_mesh_hexagonal_subarea_.side_length_of_hexagon);
 	parameter_set_->getValue(QString("Transformation ration between double data and cInt data"), get_mesh_hexagonal_subarea_.scale);
-	get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareas(mesh, mesh.mesh_slicing_);//get hexagonal subareas with cInt data type
+	parameter_set_->getValue(QString("Offset"), get_mesh_hexagonal_subarea_.offset);
+	//get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareas(mesh, mesh.mesh_slicing_);//get hexagonal subareas with cInt data type
+	get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(mesh, mesh.mesh_slicing_);//get hexagonal subareas with offsetted boundary 5.2.2017
     get_mesh_hexagonal_subarea_.getLayerContoursOrientation(mesh, slice_of_date_manager.slicing);
 	get_mesh_hexagonal_subarea_.layers_integer_.swap(std::vector<Paths> ());//free the memory 3.23.2017
 	get_mesh_hexagonal_subarea_.hexagons_in_layers_interger_.swap(std::vector<Paths>());//free the memory 3.23.2017
@@ -81,6 +83,8 @@ void ScanPathPlan::initParameters()
 	parameter_set_->addParameter(QString("Parallel Line Spacing of Hexagonal Subareas"), 0.03, QString("PLS of HS ="), QString("Parallel Line Spacing of Hexagonal Subareas"), 
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->addParameter(QString("Parallel Line Spacing of Intervals"), 0.03, QString("PLS of Intervals ="), QString("Parallel Line Spacing of Intervals"),
+		true, 1.0e-9, 1.0e8);
+	parameter_set_->addParameter(QString("Offset"), 0.2, QString("Offset ="), QString("Contours' Offset"),
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->setName(QString("SPP"));
 	parameter_set_->setLabel(QString("SPP"));
