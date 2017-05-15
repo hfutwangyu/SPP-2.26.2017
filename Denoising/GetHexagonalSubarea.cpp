@@ -45,6 +45,9 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 
 		double horizontal_x=0.0, vertical_y=0.0;
 		Paths hexagons;
+
+		std::vector<int> temp_one_layer_hexagon_column_order_;//5.12.2017
+
 		for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
 			//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
 		{
@@ -63,11 +66,15 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 						<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
 						<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale);
 					hexagons << hexagon;
+
+					temp_one_layer_hexagon_column_order_.push_back(j+1);//5.12.2017
 				}
 			}
 		}
 
 		hexagons_in_layers_interger_.push_back(hexagons);
+
+		temp_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_);//5.12.2017
 	}
 }
 
@@ -84,6 +91,9 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 
 		double horizontal_x = 0.0, vertical_y = 0.0;
 		Paths hexagons;
+
+		std::vector<int> temp_one_layer_hexagon_column_order_;//5.12.2017
+
 		if (k%2==1)
 		{
 			for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
@@ -104,6 +114,8 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 							<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
 							<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale);
 						hexagons << hexagon;
+
+						temp_one_layer_hexagon_column_order_.push_back(j + 1);//5.12.2017
 					}
 				}
 			}
@@ -128,6 +140,8 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 							<< IntPoint((horizontal_x - 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale)
 							<< IntPoint((horizontal_x + 0.5*side_length_of_hexagon)*scale, (vertical_y - 0.5*sqrt(3.0)*side_length_of_hexagon)*scale);
 						hexagons << hexagon;
+
+						temp_one_layer_hexagon_column_order_.push_back(j + 1);//5.12.2017
 					}
 				}
 			}
@@ -135,6 +149,8 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 	
 
 		hexagons_in_layers_interger_.push_back(hexagons);
+
+		temp_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_);//5.12.2017
 	}
 }
 
@@ -160,9 +176,9 @@ void GetHexagonalSubarea::getMaxAndMinXYofLayer(TriMesh::Contours &layer_contour
 
 void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
 {
-	transformLayersDataTypeToInteger(slice_of_mesh_);
+	//transformLayersDataTypeToInteger(slice_of_mesh_);
 	//getHexagons(slice_of_mesh_);///////get hexagons in each layer
-	getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
+	//getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
 	if ((layers_integer_.size()) == (hexagons_in_layers_interger_.size()))
 	{
 		int n_layers = layers_integer_.size();
@@ -170,6 +186,10 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 		{
 			Paths hexagons = hexagons_in_layers_interger_[i];
 			Paths contours_integer = layers_integer_[i];
+
+			std::vector<int> temp_one_layer_hexagon_column_order_=temp_hexagon_column_order_[i];//5.12.2017
+			std::vector<int> one_layer_hexagon_column_order_;//5.12.2017
+ 
 			std::vector<Paths> layer_solution_intersection_;
 			for (int j = 0; j < hexagons.size(); j++)
 			{
@@ -183,9 +203,12 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 				if (a_hexagon_contours_intersection_solution_.size() != 0)
 				{
 					layer_solution_intersection_.push_back(a_hexagon_contours_intersection_solution_);
+
+					one_layer_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_[j]);//5.12.2017
 				}
 			}
 			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_intersection_);
+			hexagon_column_order_.push_back(one_layer_hexagon_column_order_);//5.2.2017
 
 			Paths a_layer_solution_intersection_;
 			Clipper c_intersection;
@@ -300,9 +323,9 @@ void GetHexagonalSubarea::getOuterContoursofEachLayer(TriMesh::Slicing &slice_of
 
 void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
 {
-	transformLayersDataTypeToInteger(slice_of_mesh_);
+	//transformLayersDataTypeToInteger(slice_of_mesh_);
 	//getHexagons(slice_of_mesh_);///////get hexagons in each layer
-	getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
+	//getHexagonsStaggeredBetweenLayers(slice_of_mesh_);//get hexagons starggered between layers 4.22.2017
 	//5.1.2017
 	//getOuterContoursofEachLayer(slice_of_mesh_);
 
@@ -319,6 +342,9 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithOuterBoundryOffse
 			Paths hexagons = hexagons_in_layers_interger_[i];
 			//Paths contours_integer = layers_integer_[i];
 			Paths offsetted_contours_integer = offsetted_layers_integer_[i];
+
+			std::vector<int> temp_one_layer_hexagon_column_order_ = temp_hexagon_column_order_[i];//5.12.2017
+			std::vector<int> one_layer_hexagon_column_order_;//5.12.2017
 	/*		////////////////////////////////////
 			//offset each layer's outer contours 5.1.2017 
 			Paths outer_contours_of_a_alyer_ = layer_outer_contours_[i];
@@ -368,9 +394,12 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithOuterBoundryOffse
 				if (a_hexagon_contours_intersection_solution_.size() != 0)
 				{
 					layer_solution_intersection_.push_back(a_hexagon_contours_intersection_solution_);
+
+					one_layer_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_[j]);//5.12.2017
 				}
 			}
 			mesh.mesh_hexagoned_hexagons_int_paths_.push_back(layer_solution_intersection_);
+			hexagon_column_order_.push_back(one_layer_hexagon_column_order_);//5.2.2017
 
 			Paths a_layer_solution_intersection_;
 			Clipper c_intersection;

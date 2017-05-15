@@ -31,6 +31,8 @@ public:
 
 	std::vector<Paths> layer_outer_contours_;
 
+	std::vector<std::vector<int>> temp_hexagon_column_order_;//5.12.2017
+	std::vector<std::vector<int>> hexagon_column_order_;//5.12.2017
 	double side_length_of_bounding_hexagon=4.0;
 	double side_length_of_hexagon=3.0;
     int scale = 10000;

@@ -20,29 +20,69 @@ void ScanPathPlan::denoise()
 	slice_of_date_manager.SliceTheModel(mesh);
 	mesh.mesh_slicing_ = slice_of_date_manager.slicing;//SET THE SLICING DATA OF THE MESH
 	getSlicedLayers(mesh,slice_of_date_manager);//get each layer's position 3.22.2017
+
+
 	GetHexagonalSubarea get_mesh_hexagonal_subarea_;
+	bool subsectors_staggered_or_not_;
+	bool offset_contours_or_not_;
+	parameter_set_->getValue(QString("Staggered subsectors between layers"), subsectors_staggered_or_not_);
+	parameter_set_->getValue(QString("Offset contours"), offset_contours_or_not_);
 	parameter_set_->getValue(QString("Side Length of Rounding hexagon"), get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 	parameter_set_->getValue(QString("Side Length of hexagonal subarea"), get_mesh_hexagonal_subarea_.side_length_of_hexagon);
 	parameter_set_->getValue(QString("Transformation ration between double data and cInt data"), get_mesh_hexagonal_subarea_.scale);
 	parameter_set_->getValue(QString("Offset"), get_mesh_hexagonal_subarea_.offset);
-	//get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareas(mesh, mesh.mesh_slicing_);//get hexagonal subareas with cInt data type
-	get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(mesh, mesh.mesh_slicing_);//get hexagonal subareas with offsetted boundary 5.2.2017
+	get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
+	if (subsectors_staggered_or_not_)
+	{
+		get_mesh_hexagonal_subarea_.getHexagonsStaggeredBetweenLayers(mesh.mesh_slicing_);//get hexagons starggered between layers 4.22.2017
+	}
+	else
+	{
+		get_mesh_hexagonal_subarea_.getHexagons(mesh.mesh_slicing_);///////get hexagons in each layer
+	}
+
+	if (offset_contours_or_not_)
+	{
+		get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(mesh, mesh.mesh_slicing_);//get hexagonal subareas with offsetted boundary 5.2.2017
+	} 
+	else
+	{
+		get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareas(mesh, mesh.mesh_slicing_);//get hexagonal subareas with cInt data type
+	}
     get_mesh_hexagonal_subarea_.getLayerContoursOrientation(mesh, slice_of_date_manager.slicing);
 	get_mesh_hexagonal_subarea_.layers_integer_.swap(std::vector<Paths> ());//free the memory 3.23.2017
 	get_mesh_hexagonal_subarea_.hexagons_in_layers_interger_.swap(std::vector<Paths>());//free the memory 3.23.2017
 
 	GetHexagonHatches get_hexagon_hatches_;//get parallel line hatches of hexagonal subares
+	int subsetor_hatches_style_index_;
+	parameter_set_->getStringListIndex(QString("Subsector hatches style"), subsetor_hatches_style_index_);
 	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_hexagon_hatches_.parallel_line_spacing);
-/*	
-    // undirectional hatches
-	get_hexagon_hatches_.getParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
-*/
-	// triangular parallel hatches between adjoint 3 layers 4.17.2017
-	get_hexagon_hatches_.getTriangularParallelLinesBetweenLayers(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
-	get_hexagon_hatches_.getHexagonHatchesLines(mesh);
+	if (subsetor_hatches_style_index_==0)
+	{
+		// undirectional hatches
+		get_hexagon_hatches_.getParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.getHexagonHatchesLines(mesh);
+	} 
+	else if (subsetor_hatches_style_index_==1)
+	{
+		// triangular parallel hatches between 3 adjacent layers 4.17.2017
+		get_hexagon_hatches_.getTriangularParallelLinesBetweenLayers(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.getHexagonHatchesLines(mesh);
+	}
+	else if (subsetor_hatches_style_index_ == 2)
+	{
+		get_hexagon_hatches_.get0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.get60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.get120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		// triangular parallel hatches between 3 adjacent columns 5.12.2017
+		get_hexagon_hatches_.getHexagonHatchesLinesWithTriangularParallelLinesBetween3Columns(mesh, get_mesh_hexagonal_subarea_.hexagon_column_order_);
+	}
 	transformMeshSegmentedSlicingfromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
 	transformHexagonaHatchesFromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
-	get_hexagon_hatches_.parallel_lines_.swap(std::vector<Paths> ());//free the memory 3.23.2017
+	get_hexagon_hatches_.un_intersected_subsector_hatch_lines.swap(std::vector<Paths> ());//free the memory 3.23.2017
+	get_hexagon_hatches_._0_parallel_lines_.swap(std::vector<Paths>());//free the memory 5.11.2017
+	get_hexagon_hatches_._60_parallel_lines_.swap(std::vector<Paths>());//free the memory 5.11.2017
+	get_hexagon_hatches_._120_parallel_lines_.swap(std::vector<Paths>());//free the memory 5.11.2017
 	
 	GetIntervalHatches get_interval_hatches_;
 	parameter_set_->getValue(QString("Parallel Line Spacing of Intervals"), get_interval_hatches_.parallel_line_spacing);
@@ -74,12 +114,22 @@ void ScanPathPlan::initParameters()
 	parameter_set_->removeAllParameter();
 	parameter_set_->addParameter(QString("Layer Thickness"), 1.1, QString("Layer Thickness ="), QString("The layer thickness of the sliced model."),
 		true, 1.0e-9, 1.0e8);
+
+	parameter_set_->addParameter(QString("Offset contours"), false, QString("Offset contours"), QString("Offset contours or not."));
+	parameter_set_->addParameter(QString("Staggered subsectors between layers"), false, QString("Staggered subsectors between layers"), QString("Subsectors staggered or not bwetween layers."));
 	parameter_set_->addParameter(QString("Side Length of Rounding hexagon"), 4.0, QString("SL of RH ="), QString("The side length of rounding hexagon."),
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->addParameter(QString("Side Length of hexagonal subarea"), 3.0, QString("SL of HS ="), QString("The side length of hexagonal subarea, less than SL of RH."),
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->addParameter(QString("Transformation ration between double data and cInt data"), 1000, QString("Scale ="), QString("Double data multiply scale to get cInt data."),
 		true, 1, 100000000000);
+
+	QStringList subsector_hatches_style;
+	subsector_hatches_style.push_back(QString("undirectional hatches"));
+	subsector_hatches_style.push_back(QString("triangular parallel hatches between 3 adjacent layers"));
+	subsector_hatches_style.push_back(QString("triangular parallel hatches between 3 adjacent columns"));//5.12.2017
+	parameter_set_->addParameter(QString("Subsector hatches style"), subsector_hatches_style, 0, QString("Subsector hatches style"), QString("The style of subsector hatches."));
+
 	parameter_set_->addParameter(QString("Parallel Line Spacing of Hexagonal Subareas"), 0.03, QString("PLS of HS ="), QString("Parallel Line Spacing of Hexagonal Subareas"), 
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->addParameter(QString("Parallel Line Spacing of Intervals"), 0.03, QString("PLS of Intervals ="), QString("Parallel Line Spacing of Intervals"),
