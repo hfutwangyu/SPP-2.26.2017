@@ -45,13 +45,15 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 
 		double horizontal_x=0.0, vertical_y=0.0;
 		Paths hexagons;
+		Paths bounding_hexagons;//5.16.2017
 
 		std::vector<int> temp_one_layer_hexagon_column_order_;//5.12.2017
 
-		for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+		//for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+		for (int j = 0; (vertical_y = max_y - (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) >= (min_y - 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)//5.15.2017//5.17.2017
 			//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
 		{
-			for (int i = 0; (horizontal_x = min_x + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)
+			for (int i = 0; (horizontal_x = min_x-side_length_of_bounding_hexagon + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)//5.17.2017//5.17.2017 -side_length_of_bounding_hexagon
 				//max_x + 1.5*side_length_of_bounding_hexagon revise large blank at the outside contour boundary 4.15.2017
 			{
 				if ((i%2 == 1 && j%2 == 1)||
@@ -68,6 +70,15 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 					hexagons << hexagon;
 
 					temp_one_layer_hexagon_column_order_.push_back(j+1);//5.12.2017
+
+					Path bounding_hexagon;//5.16.2017
+					bounding_hexagon << IntPoint((horizontal_x + (side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y)*scale)
+						<< IntPoint((horizontal_x + 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y + 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+						<< IntPoint((horizontal_x - 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y + 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+						<< IntPoint((horizontal_x - (side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y)*scale)
+						<< IntPoint((horizontal_x - 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y - 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+						<< IntPoint((horizontal_x + 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y - 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale);
+					bounding_hexagons << bounding_hexagon;//////////////
 				}
 			}
 		}
@@ -75,6 +86,8 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 		hexagons_in_layers_interger_.push_back(hexagons);
 
 		temp_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_);//5.12.2017
+
+		boubding_hexagons_in_layers_interger_.push_back(bounding_hexagons);//5.16.2017
 	}
 }
 
@@ -91,15 +104,17 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 
 		double horizontal_x = 0.0, vertical_y = 0.0;
 		Paths hexagons;
+		Paths bounding_hexagons;//5.16.2017
 
 		std::vector<int> temp_one_layer_hexagon_column_order_;//5.12.2017
 
 		if (k%2==1)
 		{
-			for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+			//for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+			for (int j = 0; (vertical_y = max_y - (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) >= (min_y - 2*0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)//5.15.2017//5.17.2017
 				//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
 			{
-				for (int i = 0; (horizontal_x = min_x + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)
+				for (int i = 0; (horizontal_x = min_x-side_length_of_bounding_hexagon + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 2*1.5*side_length_of_bounding_hexagon); i++)//5.17.2017//5.17.2017 -side_length_of_bounding_hexagon
 					//max_x + 1.5*side_length_of_bounding_hexagon revise large blank at the outside contour boundary 4.15.2017
 				{
 					if ((i % 2 == 1 && j % 2 == 1) ||
@@ -116,16 +131,26 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 						hexagons << hexagon;
 
 						temp_one_layer_hexagon_column_order_.push_back(j + 1);//5.12.2017
+
+						Path bounding_hexagon;//5.16.2017
+						bounding_hexagon << IntPoint((horizontal_x + (side_length_of_bounding_hexagon-parallel_line_spacing*2/sqrt(3.0)))*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x + 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y + 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+							<< IntPoint((horizontal_x - 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y + 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+							<< IntPoint((horizontal_x - (side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x - 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y - 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+							<< IntPoint((horizontal_x + 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y - 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale);
+						bounding_hexagons << bounding_hexagon;//////////////
 					}
 				}
 			}
 		} 
 		else if (k%2==0)
 		{
-			for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+			//for (int j = 0; (vertical_y = min_y + (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) <= (max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)
+			for (int j = 0; (vertical_y = max_y - (0.5*sqrt(3.0)*side_length_of_bounding_hexagon*j)) >= (min_y - 2*0.5*sqrt(3.0)*side_length_of_bounding_hexagon); j++)//5.15.2017
 				//max_y + 0.5*sqrt(3.0)*side_length_of_bounding_hexagon  revise large blank at the outside contour boundary 4.15.2017
 			{
-				for (int i = 0; (horizontal_x = min_x +side_length_of_bounding_hexagon+ (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 1.5*side_length_of_bounding_hexagon); i++)
+				for (int i = 0; (horizontal_x = min_x-side_length_of_bounding_hexagon + side_length_of_bounding_hexagon + (1.5*side_length_of_bounding_hexagon*i)) <= (max_x + 2 * 1.5*side_length_of_bounding_hexagon); i++)//5.17.2017 -side_length_of_bounding_hexagon
 					//max_x + 1.5*side_length_of_bounding_hexagon revise large blank at the outside contour boundary 4.15.2017
 				{
 					if ((i % 2 == 1 && j % 2 == 1) ||
@@ -142,6 +167,15 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 						hexagons << hexagon;
 
 						temp_one_layer_hexagon_column_order_.push_back(j + 1);//5.12.2017
+
+						Path bounding_hexagon;//5.16.2017
+						bounding_hexagon << IntPoint((horizontal_x + (side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x + 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y + 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+							<< IntPoint((horizontal_x - 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y + 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+							<< IntPoint((horizontal_x - (side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y)*scale)
+							<< IntPoint((horizontal_x - 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y - 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale)
+							<< IntPoint((horizontal_x + 0.5*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale, (vertical_y - 0.5*sqrt(3.0)*(side_length_of_bounding_hexagon - parallel_line_spacing * 2 / sqrt(3.0)))*scale);
+						bounding_hexagons << bounding_hexagon;//////////////
 					}
 				}
 			}
@@ -151,6 +185,8 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 		hexagons_in_layers_interger_.push_back(hexagons);
 
 		temp_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_);//5.12.2017
+
+		boubding_hexagons_in_layers_interger_.push_back(bounding_hexagons);//5.16.2017
 	}
 }
 

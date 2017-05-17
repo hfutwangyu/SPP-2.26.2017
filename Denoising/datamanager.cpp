@@ -114,13 +114,48 @@ bool DataManager::ExportCLIToFile(std::string filename, std::string first, std::
 
 					TriMesh::HatchesForOneLayersInterval interval_hatches_of_a_layer=mesh_.mesh_interval_hatches_double_[i];
 					//export one layer's interval hatches
+					/*int num_of_interval_hatches = 0;
+					for (int j = 0; j < interval_hatches_of_a_layer.size(); j++)
+					{
+						TriMesh::Segment seg = interval_hatches_of_a_layer[j];
+						if (seg.size()>2)
+						{
+							num_of_interval_hatches += (seg.size() + 1);
+						}
+						else
+						{
+							num_of_interval_hatches += 2;
+						}
+					}
+					out << "$$HATCHES/" << 1 << "," << num_of_interval_hatches;*/
 					out << "$$HATCHES/" << 1 << "," << interval_hatches_of_a_layer.size();
+					
 					for (int j = 0; j < interval_hatches_of_a_layer.size();j++)
 					{
 						TriMesh::Segment seg = interval_hatches_of_a_layer[j];
 						TriMesh::Point start_pt = seg[0];
 						TriMesh::Point end_pt = seg[1];
 						out << "," << start_pt[0] << "," << start_pt[1] << "," << end_pt[0] << "," << end_pt[1];
+
+			/*			TriMesh::Segment seg = interval_hatches_of_a_layer[j];
+						if (seg.size()>2)
+						{
+							for (int k = 0; k < seg.size(); k++)
+							{
+								TriMesh::Point pt = seg[k];
+								out << "," << pt[0] << "," << pt[1];
+							}
+							TriMesh::Point pt = seg[0];
+							out << "," << pt[0] << "," << pt[1];
+						} 
+						else
+						{
+							TriMesh::Segment seg = interval_hatches_of_a_layer[j];
+						    TriMesh::Point start_pt = seg[0];
+						    TriMesh::Point end_pt = seg[1];
+						    out << "," << start_pt[0] << "," << start_pt[1] << "," << end_pt[0] << "," << end_pt[1];
+						}*/
+				
 					}
 					out << "\n";
 
@@ -191,13 +226,47 @@ bool DataManager::ExportCLIToFile(std::string filename, std::string first, std::
 
 					TriMesh::HatchesForOneLayersInterval interval_hatches_of_a_layer = mesh_.mesh_interval_hatches_double_[i];
 					//export one layer's interval hatches
+				/*	int num_of_interval_hatches=0;
+					for (int j = 0; j < interval_hatches_of_a_layer.size(); j++)
+					{
+						TriMesh::Segment seg = interval_hatches_of_a_layer[j];
+						if (seg.size()>2)
+						{
+							num_of_interval_hatches += (seg.size() + 1);
+						}
+						else 
+						{
+							num_of_interval_hatches += 2;
+						}
+					}
+					out << "$$HATCHES/" << 1 << "," << num_of_interval_hatches;*/
 					out << "$$HATCHES/" << 1 << "," << interval_hatches_of_a_layer.size();
+					
 					for (int j = 0; j < interval_hatches_of_a_layer.size(); j++)
 					{
 						TriMesh::Segment seg = interval_hatches_of_a_layer[j];
 						TriMesh::Point start_pt = seg[0];
 						TriMesh::Point end_pt = seg[1];
 						out << "," << start_pt[0] << "," << start_pt[1] << "," << end_pt[0] << "," << end_pt[1];
+			/*			TriMesh::Segment seg = interval_hatches_of_a_layer[j];
+						if (seg.size()>2)
+						{
+							for (int k = 0; k < seg.size(); k++)
+							{
+								TriMesh::Point pt = seg[k];
+								out << "," << pt[0] << "," << pt[1];
+							}
+							TriMesh::Point pt = seg[0];
+							out << "," << pt[0] << "," << pt[1];
+						}
+						else
+						{
+							TriMesh::Segment seg = interval_hatches_of_a_layer[j];
+							TriMesh::Point start_pt = seg[0];
+							TriMesh::Point end_pt = seg[1];
+							out << "," << start_pt[0] << "," << start_pt[1] << "," << end_pt[0] << "," << end_pt[1];
+						}*/
+
 					}
 					out << "\n";
 

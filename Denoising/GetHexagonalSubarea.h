@@ -26,6 +26,7 @@ public:
 
 public:
 	std::vector<Paths> hexagons_in_layers_interger_;
+	std::vector<Paths> boubding_hexagons_in_layers_interger_;//5.16.2017
 	std::vector<Paths> layers_integer_;
 	std::vector<Paths> offsetted_layers_integer_;
 
@@ -37,7 +38,7 @@ public:
 	double side_length_of_hexagon=3.0;
     int scale = 10000;
 	double offset=0.1;
-
+	double parallel_line_spacing = 0.4;
 
 	
 	

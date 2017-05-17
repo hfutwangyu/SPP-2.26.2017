@@ -30,6 +30,7 @@ void ScanPathPlan::denoise()
 	parameter_set_->getValue(QString("Side Length of Rounding hexagon"), get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 	parameter_set_->getValue(QString("Side Length of hexagonal subarea"), get_mesh_hexagonal_subarea_.side_length_of_hexagon);
 	parameter_set_->getValue(QString("Transformation ration between double data and cInt data"), get_mesh_hexagonal_subarea_.scale);
+	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_mesh_hexagonal_subarea_.parallel_line_spacing);
 	parameter_set_->getValue(QString("Offset"), get_mesh_hexagonal_subarea_.offset);
 	get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
 	if (subsectors_staggered_or_not_)
@@ -50,7 +51,7 @@ void ScanPathPlan::denoise()
 		get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareas(mesh, mesh.mesh_slicing_);//get hexagonal subareas with cInt data type
 	}
     get_mesh_hexagonal_subarea_.getLayerContoursOrientation(mesh, slice_of_date_manager.slicing);
-	get_mesh_hexagonal_subarea_.layers_integer_.swap(std::vector<Paths> ());//free the memory 3.23.2017
+	//get_mesh_hexagonal_subarea_.layers_integer_.swap(std::vector<Paths> ());//free the memory 3.23.2017
 	get_mesh_hexagonal_subarea_.hexagons_in_layers_interger_.swap(std::vector<Paths>());//free the memory 3.23.2017
 
 	GetHexagonHatches get_hexagon_hatches_;//get parallel line hatches of hexagonal subares
@@ -86,10 +87,22 @@ void ScanPathPlan::denoise()
 	
 	GetIntervalHatches get_interval_hatches_;
 	parameter_set_->getValue(QString("Parallel Line Spacing of Intervals"), get_interval_hatches_.parallel_line_spacing);
-	get_interval_hatches_.get0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
-	get_interval_hatches_.get60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
-	get_interval_hatches_.get120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
-	get_interval_hatches_.getIntervalHatchTriangles(mesh);
+	if ((get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon - get_mesh_hexagonal_subarea_.side_length_of_hexagon)*sqrt(3.0)<(2 * get_hexagon_hatches_.parallel_line_spacing)&&
+		(get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon - get_mesh_hexagonal_subarea_.side_length_of_hexagon)*sqrt(3.0)> get_hexagon_hatches_.parallel_line_spacing)
+		//add Y Connection 5.16.2017
+	{
+		get_interval_hatches_.getY0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale,get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
+		get_interval_hatches_.getY60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale, get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
+		get_interval_hatches_.getY120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale, get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
+		get_interval_hatches_.getIntervalHatchYConnection(mesh,get_mesh_hexagonal_subarea_.layers_integer_ ,get_mesh_hexagonal_subarea_.boubding_hexagons_in_layers_interger_);
+	} 
+	else
+	{
+		get_interval_hatches_.get0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_interval_hatches_.get60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_interval_hatches_.get120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_interval_hatches_.getIntervalHatchTriangles(mesh);
+	}
 	get_interval_hatches_._0_parallel_lines_.swap(std::vector<Paths>());//free the memory 3.23.2017
 	get_interval_hatches_._60_parallel_lines_.swap(std::vector<Paths>());//free the memory 3.23.2017
 	get_interval_hatches_._120_parallel_lines_.swap(std::vector<Paths>());//free the memory 3.23.2017
@@ -228,17 +241,71 @@ void ScanPathPlan::transformIntervalsHatchesFromCIntToDouble(TriMesh &mesh, Slic
 			for (int k = 0; k < ps.size();k++)
 			{
 				Path p = ps[k];
-				TriMesh::Segment seg;
-				for (int n = 0; n < p.size(); n++)
+				//TriMesh::Segment seg;
+				//for (int n = 0; n < p.size(); n++)
+				//{
+				//	IntPoint ipt = p[n];
+				//	TriMesh::Point pt;
+				//	pt[0] = (double)(ipt.X) / (get_mesh_hexagonal_subarea_.scale);
+				//	pt[1] = (double)(ipt.Y) / (get_mesh_hexagonal_subarea_.scale);
+				//	pt[2] = z;
+				//	seg.push_back(pt);
+				//}
+				if (p.size() > 2)
 				{
-					IntPoint ipt = p[n];
-					TriMesh::Point pt;
-					pt[0] = (double)(ipt.X) / (get_mesh_hexagonal_subarea_.scale);
-					pt[1] = (double)(ipt.Y) / (get_mesh_hexagonal_subarea_.scale);
-					pt[2] = z;
-					seg.push_back(pt);
+					for (int k = 0; k < p.size() - 1; k++)
+					{
+						TriMesh::Segment seg;
+						IntPoint int_pt_s = p[k];
+						TriMesh::Point mesh_point_s;
+						mesh_point_s[0] = (double)(int_pt_s.X) / (get_mesh_hexagonal_subarea_.scale);
+						mesh_point_s[1] = (double)(int_pt_s.Y) / (get_mesh_hexagonal_subarea_.scale);
+						mesh_point_s[2] = z;
+
+						IntPoint int_pt_e = p[k + 1];
+						TriMesh::Point  mesh_point_e;
+						seg.push_back(mesh_point_s);
+						mesh_point_e[0] = (double)(int_pt_e.X) / (get_mesh_hexagonal_subarea_.scale);
+						mesh_point_e[1] = (double)(int_pt_e.Y) / (get_mesh_hexagonal_subarea_.scale);
+						mesh_point_e[2] = z;
+						seg.push_back(mesh_point_e);
+
+						interval_hatches_of_a_layer.push_back(seg);
+					}
+
+					TriMesh::Segment seg;
+
+					IntPoint int_pt_s = p.back();
+					TriMesh::Point mesh_point_s;
+					mesh_point_s[0] = (double)(int_pt_s.X) / (get_mesh_hexagonal_subarea_.scale);
+					mesh_point_s[1] = (double)(int_pt_s.Y) / (get_mesh_hexagonal_subarea_.scale);
+					mesh_point_s[2] = z;
+                    seg.push_back(mesh_point_s);
+
+					IntPoint int_pt_e = p.front();
+					TriMesh::Point  mesh_point_e;
+					mesh_point_e[0] = (double)(int_pt_e.X) / (get_mesh_hexagonal_subarea_.scale);
+					mesh_point_e[1] = (double)(int_pt_e.Y) / (get_mesh_hexagonal_subarea_.scale);
+					mesh_point_e[2] = z;
+					seg.push_back(mesh_point_e);
+
+					interval_hatches_of_a_layer.push_back(seg);
 				}
-				interval_hatches_of_a_layer.push_back(seg);
+				else if (p.size() == 2)
+				{
+					TriMesh::Segment seg;
+					for (int k = 0; k < p.size(); k++)
+					{
+						IntPoint int_pt = p[k];
+						TriMesh::Point mesh_point;
+						mesh_point[0] = (double)(int_pt.X) / (get_mesh_hexagonal_subarea_.scale);
+						mesh_point[1] = (double)(int_pt.Y) / (get_mesh_hexagonal_subarea_.scale);
+						mesh_point[2] = z;
+						seg.push_back(mesh_point);
+					}
+					interval_hatches_of_a_layer.push_back(seg);
+				}
+				//interval_hatches_of_a_layer.push_back(seg);
 			}
 		}
 		mesh.mesh_interval_hatches_double_.push_back(interval_hatches_of_a_layer);
