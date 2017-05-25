@@ -87,7 +87,7 @@ void GetHexagonalSubarea::getHexagons(TriMesh::Slicing &slice_of_mesh_)
 
 		temp_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_);//5.12.2017
 
-		boubding_hexagons_in_layers_interger_.push_back(bounding_hexagons);//5.16.2017
+		interior_hexagons_in_layers_interger_.push_back(bounding_hexagons);//5.16.2017
 	}
 }
 
@@ -186,7 +186,7 @@ void GetHexagonalSubarea::getHexagonsStaggeredBetweenLayers(TriMesh::Slicing &sl
 
 		temp_hexagon_column_order_.push_back(temp_one_layer_hexagon_column_order_);//5.12.2017
 
-		boubding_hexagons_in_layers_interger_.push_back(bounding_hexagons);//5.16.2017
+		interior_hexagons_in_layers_interger_.push_back(bounding_hexagons);//5.16.2017
 	}
 }
 
@@ -252,11 +252,48 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareas(TriMesh &mesh, TriMe
 			c_intersection.AddPaths(hexagons, ptClip, true);
 			c_intersection.Execute(ctIntersection, a_layer_solution_intersection_, pftEvenOdd, pftEvenOdd);//get subareas
 			Paths layer_solution_difference_;
+			PolyTree polytree_layer_solution_difference_;
 			Clipper c_difference;
 			c_difference.AddPaths(contours_integer, ptSubject, true);
 			c_difference.AddPaths(a_layer_solution_intersection_, ptClip, true);
-			c_difference.Execute(ctDifference, layer_solution_difference_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+			c_difference.Execute(ctDifference, polytree_layer_solution_difference_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+			ClosedPathsFromPolyTree(polytree_layer_solution_difference_, layer_solution_difference_);
 			mesh.mesh_areas_betweent_hexagons_int_paths_.push_back(layer_solution_difference_);
+
+			////offset subsectors for interval hatches crossing subsectors//5.18.2017
+			//Paths a_layer_offsetted_subsectors_;
+			//for (int k = 0; k < a_layer_solution_intersection_.size();k++)
+			//{
+			//	Path p = a_layer_solution_intersection_[k];
+			//	Paths solution;
+			//	ClipperOffset co;
+			//	co.AddPath(p, jtMiter, etClosedPolygon);
+			//	co.Execute(solution, (0.0 - parallel_line_spacing)*scale);
+			//	if (solution.size()!=0)
+			//	{
+			//		for (int l = 0; l < solution.size();l++)
+			//		{
+			//			Path pp = solution[l];
+			//			a_layer_offsetted_subsectors_.push_back(pp);
+			//		}					
+			//	}
+			//}
+			//Paths layer_solution_difference_with_offsected_subsectors_;
+			//Clipper c_difference_with_offsetted_subsectors_;
+			//c_difference_with_offsetted_subsectors_.AddPaths(contours_integer, ptSubject, true);
+			//c_difference_with_offsetted_subsectors_.AddPaths(a_layer_offsetted_subsectors_, ptClip, true);
+			//c_difference_with_offsetted_subsectors_.Execute(ctDifference, layer_solution_difference_with_offsected_subsectors_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+
+			    ////5.19.2017
+			/*Paths layer_solution_difference_with_offseted_subsectors_;
+			offsetIntervalContoursWithHexagonSubsectors(contours_integer, a_layer_solution_intersection_, layer_solution_difference_with_offseted_subsectors_);
+			intervals_with_negative_offseted_subsectors_.push_back(layer_solution_difference_with_offseted_subsectors_);*/
+
+			/////5.19.2017
+			Paths layer_solution_difference_with_offseted_intervals_;
+			offsetIntervalContoursWithIntervals(contours_integer, layer_solution_difference_, layer_solution_difference_with_offseted_intervals_);
+			intervals_with_negative_offseted_subsectors_.push_back(layer_solution_difference_with_offseted_intervals_);
+			//////////////////////////////////////////////////////////////////////////
 		}
 	}
 	else
@@ -444,12 +481,49 @@ void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithOuterBoundryOffse
 			c_intersection.AddPaths(hexagons, ptClip, true);
 			c_intersection.Execute(ctIntersection, a_layer_solution_intersection_, pftEvenOdd, pftEvenOdd);//get subareas
 			Paths layer_solution_difference_;
+			PolyTree polytree_layer_solution_difference_;
 			Clipper c_difference;
 			Paths contours_integer = layers_integer_[i];///
 			c_difference.AddPaths(contours_integer, ptSubject, true);
 			c_difference.AddPaths(a_layer_solution_intersection_, ptClip, true);
-			c_difference.Execute(ctDifference, layer_solution_difference_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+			c_difference.Execute(ctDifference, polytree_layer_solution_difference_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+			ClosedPathsFromPolyTree(polytree_layer_solution_difference_, layer_solution_difference_);
 			mesh.mesh_areas_betweent_hexagons_int_paths_.push_back(layer_solution_difference_);
+
+			////offset subsectors for interval hatches crossing subsectors//5.18.2017
+			//Paths a_layer_offsetted_subsectors_;
+			//for (int k = 0; k < a_layer_solution_intersection_.size(); k++)
+			//{
+			//	Path p = a_layer_solution_intersection_[k];
+			//	Paths solution;
+			//	ClipperOffset co;
+			//	co.AddPath(p, jtMiter, etClosedPolygon);
+			//	co.Execute(solution, (0.0 - parallel_line_spacing)*scale);
+			//	if (solution.size() != 0)
+			//	{
+			//		for (int l = 0; l < solution.size(); l++)
+			//		{
+			//			Path pp = solution[l];
+			//			a_layer_offsetted_subsectors_.push_back(pp);
+			//		}
+			//	}
+			//}
+			//Paths layer_solution_difference_with_offsected_subsectors_;
+			//Clipper c_difference_with_offsetted_subsectors_;
+			//c_difference_with_offsetted_subsectors_.AddPaths(contours_integer, ptSubject, true);
+			//c_difference_with_offsetted_subsectors_.AddPaths(a_layer_offsetted_subsectors_, ptClip, true);
+			//c_difference_with_offsetted_subsectors_.Execute(ctDifference, layer_solution_difference_with_offsected_subsectors_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+
+			    ////5.19.2017
+			/*Paths layer_solution_difference_with_offseted_subsectors_;
+			offsetIntervalContoursWithHexagonSubsectors(contours_integer, a_layer_solution_intersection_, layer_solution_difference_with_offseted_subsectors_);
+			intervals_with_negative_offseted_subsectors_.push_back(layer_solution_difference_with_offseted_subsectors_);*/
+
+			     /////5.19.2017
+			Paths layer_solution_difference_with_offseted_intervals_;
+			offsetIntervalContoursWithIntervals(contours_integer, layer_solution_difference_,layer_solution_difference_with_offseted_intervals_);
+			intervals_with_negative_offseted_subsectors_.push_back(layer_solution_difference_with_offseted_intervals_);
+			//////////////////////////////////////////////////////////////////////////
 		}
 	}
 	else
@@ -581,5 +655,73 @@ void GetHexagonalSubarea::OffsetForAllLayerContours(TriMesh::Slicing &slice_of_m
 		}
 
 		offsetted_layers_integer_.push_back(offseted_a_layer_contours_);
+	}
+}
+
+
+void GetHexagonalSubarea::offsetIntervalContoursWithHexagonSubsectors(Paths &contours_integer,Paths &a_layer_solution_intersection_, Paths &layer_solution_difference_with_offseted_subsectors_)
+{
+	Paths a_layer_offsetted_subsectors_;
+	for (int k = 0; k < a_layer_solution_intersection_.size(); k++)
+	{
+		Path p = a_layer_solution_intersection_[k];
+		Paths solution;
+		ClipperOffset co;
+		co.AddPath(p, jtMiter, etClosedPolygon);
+		co.Execute(solution, (0.0 - parallel_line_spacing)*scale);
+		if (solution.size() != 0)
+		{
+			for (int l = 0; l < solution.size(); l++)
+			{
+				Path pp = solution[l];
+				a_layer_offsetted_subsectors_.push_back(pp);
+			}
+		}
+	}
+	Clipper c_difference_with_offsetted_subsectors_;
+	c_difference_with_offsetted_subsectors_.AddPaths(contours_integer, ptSubject, true);
+	c_difference_with_offsetted_subsectors_.AddPaths(a_layer_offsetted_subsectors_, ptClip, true);
+	c_difference_with_offsetted_subsectors_.Execute(ctDifference, layer_solution_difference_with_offseted_subsectors_, pftEvenOdd, pftEvenOdd);///get intervals between hexagonal subareas
+}
+
+
+void GetHexagonalSubarea::offsetIntervalContoursWithIntervals(Paths &contours_integer, Paths &a_layer_solution_difference_, Paths &layer_solution_difference_with_offsected_intervals_)
+{
+	Paths a_layer_offsetted_intervals_;
+	for (int k = 0; k < a_layer_solution_difference_.size();k++)
+	{
+		Path p = a_layer_solution_difference_[k];
+		Paths offseted_interval_contopur_;
+
+		if (Orientation(p))// offset
+		{
+			ClipperOffset co;
+			co.AddPath(p, jtMiter, etClosedPolygon);
+			co.Execute(offseted_interval_contopur_,  parallel_line_spacing*scale);
+		}
+		else
+		{
+			ClipperOffset co;
+			co.AddPath(p, jtMiter, etClosedPolygon);
+			co.Execute(offseted_interval_contopur_, (0.0 - parallel_line_spacing)*scale);
+		}
+
+		if (offseted_interval_contopur_.size()!=0)
+		{
+			Clipper offseted_interval_contour_intersect_with_layer_contours_;
+			Paths solution;
+			offseted_interval_contour_intersect_with_layer_contours_.AddPaths(contours_integer, ptSubject, true);
+			offseted_interval_contour_intersect_with_layer_contours_.AddPaths(offseted_interval_contopur_, ptClip, true);
+			offseted_interval_contour_intersect_with_layer_contours_.Execute(ctIntersection, solution, pftEvenOdd, pftEvenOdd);
+			if (solution.size()!=0)
+			{
+				for (int i = 0; i < solution.size();i++)
+				{
+					Path solution_p = solution[i];
+					layer_solution_difference_with_offsected_intervals_.push_back(solution_p);
+				}
+			}
+		}
+
 	}
 }

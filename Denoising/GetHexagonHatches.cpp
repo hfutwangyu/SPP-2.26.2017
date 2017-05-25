@@ -322,3 +322,168 @@ void GetHexagonHatches::getHexagonHatchesLinesWithTriangularParallelLinesBetween
 		exit(1);
 	}
 }
+
+
+void GetHexagonHatches::get0ParallelLinesForTriangularHatches(TriMesh::Slicing &slice_of_mesh_, int &scale)
+{
+	for (auto contours_it = slice_of_mesh_.begin(); contours_it != slice_of_mesh_.end(); contours_it++)
+	{
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = *contours_it;
+		GetHexagonalSubarea get_mesh_hexagonal_subarea_;
+		get_mesh_hexagonal_subarea_.getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		double horizontal_min = min_x - 1.0,
+			horizontal_max = max_x + 1.0,
+			vertical_y = 0.0,
+			vertical_min = min_y;
+		Paths lines;
+		for (int i = 0; (vertical_y = max_y + (max_x - min_x)*sqrt(3.0) - i*1.5*parallel_line_spacing) >= vertical_min; i++)
+			//for (int i = 0; (vertical_y = max_y + (max_x - min_x)*sqrt(3.0) - i*sqrt(3.0)*parallel_line_spacing/2.0) >= vertical_min; i++)
+		{
+			Path line;
+			line << IntPoint(horizontal_min*scale, vertical_y*scale)
+				<< IntPoint(horizontal_max*scale, vertical_y*scale);
+			lines << line;
+		}
+		_0_parallel_lines_for_triangular_hatches.push_back(lines);
+	}
+}
+
+
+void GetHexagonHatches::get60ParallelLinesForTriangularHatches(TriMesh::Slicing &slice_of_mesh_, int &scale)
+{
+	for (auto contours_it = slice_of_mesh_.begin(); contours_it != slice_of_mesh_.end(); contours_it++)
+	{
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = *contours_it;
+		GetHexagonalSubarea get_mesh_hexagonal_subarea_;
+		get_mesh_hexagonal_subarea_.getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		double start_x = 0.0,
+			start_y = min_y - 1.0,
+			end_x = max_x,
+			end_y = max_y + (max_x - min_x)*sqrt(3.0);
+		Paths lines;
+		for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*2.0*1.5*parallel_line_spacing / sqrt(3.0)) <= max_x; i++)
+			//for (int i = 0; (start_x = min_x - (max_y - min_y + 1.0) / sqrt(3.0) + i*parallel_line_spacing) <= max_x; end_x = max_x + i* parallel_line_spacing, i++)
+		{
+			end_x = max_x + i*2.0*1.5*parallel_line_spacing / sqrt(3.0);
+			//end_x = end_x + parallel_line_spacing ;
+			Path line;
+			line << IntPoint(start_x*scale, start_y*scale)
+				<< IntPoint(end_x*scale, end_y*scale);
+			lines << line;
+		}
+		_60_parallel_lines_for_triangular_hatches.push_back(lines);
+	}
+}
+
+
+void GetHexagonHatches::get120ParallelLinesForTriangularHatches(TriMesh::Slicing &slice_of_mesh_, int &scale)
+{
+	for (auto contours_it = slice_of_mesh_.begin(); contours_it != slice_of_mesh_.end(); contours_it++)
+	{
+
+		double min_x = 1.0e8, max_x = 1.0e-9, min_y = 1.0e8, max_y = 1.0e-9;
+		TriMesh::Contours layer_contours = *contours_it;
+		GetHexagonalSubarea get_mesh_hexagonal_subarea_;
+		get_mesh_hexagonal_subarea_.getMaxAndMinXYofLayer(layer_contours, min_x, max_x, min_y, max_y);
+
+		double //start_x = (max_y-min_y+1.0)/sqrt(3.0)+2*max_x-min_x,
+			start_x = 0.0,
+			start_y = min_y - 1.0,
+			end_x = max_x,
+			end_y = max_y + (max_x - min_x)*sqrt(3.0);
+		Paths lines;
+		for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - 2.0*i*1.5*parallel_line_spacing / sqrt(3.0)) >= min_x; i++)
+			//for (int i = 0; (start_x = (max_y - min_y + 1.0) / sqrt(3.0) + 2 * max_x - min_x - i*parallel_line_spacing) >= min_x; end_x = max_x - i*parallel_line_spacing, i++)
+		{
+			end_x = max_x - i*2.0*1.5*parallel_line_spacing / sqrt(3.0);
+			//end_x = end_x - parallel_line_spacing;
+			Path line;
+			line << IntPoint(start_x*scale, start_y*scale)
+				<< IntPoint(end_x*scale, end_y*scale);
+			lines << line;
+		}
+		_120_parallel_lines_for_triangular_hatches.push_back(lines);
+	}
+}
+
+
+void GetHexagonHatches::getHexagoHatchesWithTriangularHatches(TriMesh &mesh)
+{
+	if ((_0_parallel_lines_for_triangular_hatches.size() == _60_parallel_lines_for_triangular_hatches.size()) &&
+		(_0_parallel_lines_for_triangular_hatches.size() == _120_parallel_lines_for_triangular_hatches.size()))
+	{
+		for (int i = 0; i < _0_parallel_lines_for_triangular_hatches.size(); i++)
+		{
+			std::vector<Paths> layer_solution;
+
+			for (int j = 0; j < mesh.mesh_hexagoned_hexagons_int_paths_[i].size(); j++)
+			{
+
+				Paths ps_ = mesh.mesh_hexagoned_hexagons_int_paths_[i][j];
+				Clipper c_0_,c_60_,c_120;
+				PolyTree solution_0_,solution_60_,solution_120_;
+		        Paths subsector_solution;
+
+					Paths lines_120_ = _120_parallel_lines_for_triangular_hatches[i];
+					c_120.AddPaths(lines_120_, ptSubject, false);
+					c_120.AddPaths(ps_, ptClip, true);
+					c_120.Execute(ctIntersection, solution_120_, pftEvenOdd, pftEvenOdd);
+					Paths ps_120;
+					OpenPathsFromPolyTree(solution_120_, ps_120);
+					if (ps_120.size() != 0)
+					{
+						for (int k = 0; k < ps_120.size();k++)
+						{
+							Path p = ps_120[k];
+							subsector_solution.push_back(p);
+						}
+			
+					}
+			
+
+					Paths lines_0_ = _0_parallel_lines_for_triangular_hatches[i];
+					c_0_.AddPaths(lines_0_, ptSubject, false);
+					c_0_.AddPaths(ps_, ptClip, true);
+					c_0_.Execute(ctIntersection, solution_0_, pftEvenOdd, pftEvenOdd);
+					Paths ps_0_;
+					OpenPathsFromPolyTree(solution_0_, ps_0_);
+					if (ps_0_.size() != 0)
+					{
+						for (int k = 0; k < ps_0_.size(); k++)
+						{
+							Path p = ps_0_[k];
+							subsector_solution.push_back(p);
+						}
+					}
+
+
+					Paths lines_60_ = _60_parallel_lines_for_triangular_hatches[i];
+					c_60_.AddPaths(lines_60_, ptSubject, false);
+					c_60_.AddPaths(ps_, ptClip, true);
+					c_60_.Execute(ctIntersection, solution_60_, pftEvenOdd, pftEvenOdd);
+					Paths ps_60_;
+					OpenPathsFromPolyTree(solution_60_, ps_60_);
+					if (ps_60_.size() != 0)
+					{
+						for (int k = 0; k < ps_60_.size(); k++)
+						{
+							Path p = ps_60_[k];
+							subsector_solution.push_back(p);
+						}
+					}
+
+					layer_solution.push_back(subsector_solution);
+			}
+			mesh.mesh_hexagon_hatches_int_.push_back(layer_solution);
+		}
+	}
+	else
+	{
+		exit(1);
+	}
+}
+

@@ -237,21 +237,21 @@ void GetIntervalHatches::getY0ParallelLines(TriMesh::Slicing &slice_of_mesh_, in
 	}
 }
 
-void GetIntervalHatches::getIntervalHatchYConnection(TriMesh &mesh, std::vector<Paths> &layers_integer_, std::vector<Paths> &bounding_hexagons_in_layers_interger_)
+void GetIntervalHatches::getIntervalHatchYConnection(TriMesh &mesh, std::vector<Paths> &layers_integer_, std::vector<Paths> &interior_hexagons_in_layers_interger_)
 //add Y Connection 5.16.2017
 {
 	if ((Y_0_parallel_lines_.size() == Y_60_parallel_lines_.size())
 		&& (Y_0_parallel_lines_.size() == Y_120_parallel_lines_.size())
-		&&(Y_0_parallel_lines_.size()==bounding_hexagons_in_layers_interger_.size())
+		&&(Y_0_parallel_lines_.size()==interior_hexagons_in_layers_interger_.size())
 		&& (Y_0_parallel_lines_.size() == layers_integer_.size()))
 	{
-		for (int i = 0; i < bounding_hexagons_in_layers_interger_.size();i++)
+		for (int i = 0; i < interior_hexagons_in_layers_interger_.size();i++)
 		{
 			Paths y_0_lines = Y_0_parallel_lines_[i],
 				y_60_lines = Y_60_parallel_lines_[i],
 				y_120_lines = Y_120_parallel_lines_[i];
 			Paths layer_contours = layers_integer_[i];
-			Paths hexagons = bounding_hexagons_in_layers_interger_[i];
+			Paths hexagons = interior_hexagons_in_layers_interger_[i];
 
 			std::vector<Paths> layer_solution_;
 
@@ -299,6 +299,56 @@ void GetIntervalHatches::getIntervalHatchYConnection(TriMesh &mesh, std::vector<
 			mesh.mesh_interval_hatches_int_.push_back(layer_solution_);
 		}
 	} 
+	else
+	{
+		exit(1);
+	}
+}
+
+
+void GetIntervalHatches::getIntervalHatchTrianglesCrossedSubsectors(TriMesh &mesh, std::vector<Paths> &intervals_with_negative_offseted_subsectors_)
+{
+	if ((_0_parallel_lines_.size() == _60_parallel_lines_.size())
+		&& (_0_parallel_lines_.size() == _120_parallel_lines_.size()))
+	{
+		for (int i = 0; i < _0_parallel_lines_.size(); i++)
+		{
+			Paths _0_lines = _0_parallel_lines_[i],
+				_60_lines = _60_parallel_lines_[i],
+				_120_lines = _120_parallel_lines_[i];
+			Paths one_layer_intervals_ = intervals_with_negative_offseted_subsectors_[i];
+
+			std::vector<Paths> layer_solution_;
+			Clipper c_0_;
+			PolyTree solution_polytree_0_;
+			c_0_.AddPaths(_0_lines, ptSubject, false);
+			c_0_.AddPaths(one_layer_intervals_, ptClip, true);
+			c_0_.Execute(ctIntersection, solution_polytree_0_, pftEvenOdd, pftEvenOdd);
+			Paths solution_paths_0_;
+			OpenPathsFromPolyTree(solution_polytree_0_, solution_paths_0_);
+			layer_solution_.push_back(solution_paths_0_);
+
+			Clipper c_60_;
+			PolyTree solution_polytree_60_;
+			c_60_.AddPaths(_60_lines, ptSubject, false);
+			c_60_.AddPaths(one_layer_intervals_, ptClip, true);
+			c_60_.Execute(ctIntersection, solution_polytree_60_, pftEvenOdd, pftEvenOdd);
+			Paths solution_paths_60_;
+			OpenPathsFromPolyTree(solution_polytree_60_, solution_paths_60_);
+			layer_solution_.push_back(solution_paths_60_);
+
+			Clipper c_120_;
+			PolyTree solution_polytree_120_;
+			c_120_.AddPaths(_120_lines, ptSubject, false);
+			c_120_.AddPaths(one_layer_intervals_, ptClip, true);
+			c_120_.Execute(ctIntersection, solution_polytree_120_, pftEvenOdd, pftEvenOdd);
+			Paths solution_paths_120_;
+			OpenPathsFromPolyTree(solution_polytree_120_, solution_paths_120_);
+			layer_solution_.push_back(solution_paths_120_);
+
+			mesh.mesh_interval_hatches_int_.push_back(layer_solution_);
+		}
+	}
 	else
 	{
 		exit(1);

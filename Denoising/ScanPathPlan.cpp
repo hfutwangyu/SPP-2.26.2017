@@ -78,14 +78,26 @@ void ScanPathPlan::denoise()
 		// triangular parallel hatches between 3 adjacent columns 5.12.2017
 		get_hexagon_hatches_.getHexagonHatchesLinesWithTriangularParallelLinesBetween3Columns(mesh, get_mesh_hexagonal_subarea_.hexagon_column_order_);
 	}
+	else if (subsetor_hatches_style_index_ == 3)
+	{
+		get_hexagon_hatches_.get0ParallelLinesForTriangularHatches(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.get60ParallelLinesForTriangularHatches(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.get120ParallelLinesForTriangularHatches(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
+		get_hexagon_hatches_.getHexagoHatchesWithTriangularHatches(mesh);
+	}
 	transformMeshSegmentedSlicingfromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
 	transformHexagonaHatchesFromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
 	get_hexagon_hatches_.un_intersected_subsector_hatch_lines.swap(std::vector<Paths> ());//free the memory 3.23.2017
 	get_hexagon_hatches_._0_parallel_lines_.swap(std::vector<Paths>());//free the memory 5.11.2017
 	get_hexagon_hatches_._60_parallel_lines_.swap(std::vector<Paths>());//free the memory 5.11.2017
 	get_hexagon_hatches_._120_parallel_lines_.swap(std::vector<Paths>());//free the memory 5.11.2017
+	get_hexagon_hatches_._0_parallel_lines_for_triangular_hatches.swap(std::vector<Paths>());//free the memory 5.18.2017
+	get_hexagon_hatches_._60_parallel_lines_for_triangular_hatches.swap(std::vector<Paths>());//free the memory 5.18.2017
+	get_hexagon_hatches_._120_parallel_lines_for_triangular_hatches.swap(std::vector<Paths>());//free the memory 5.18.2017
 	
 	GetIntervalHatches get_interval_hatches_;
+	bool interval_hatches_cross_subsectors_or_not_;
+	parameter_set_->getValue(QString("Interval hathces cross then subsectors"), interval_hatches_cross_subsectors_or_not_);
 	parameter_set_->getValue(QString("Parallel Line Spacing of Intervals"), get_interval_hatches_.parallel_line_spacing);
 	if ((get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon - get_mesh_hexagonal_subarea_.side_length_of_hexagon)*sqrt(3.0)<(2 * get_hexagon_hatches_.parallel_line_spacing)&&
 		(get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon - get_mesh_hexagonal_subarea_.side_length_of_hexagon)*sqrt(3.0)> get_hexagon_hatches_.parallel_line_spacing)
@@ -94,14 +106,23 @@ void ScanPathPlan::denoise()
 		get_interval_hatches_.getY0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale,get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 		get_interval_hatches_.getY60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale, get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 		get_interval_hatches_.getY120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale, get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
-		get_interval_hatches_.getIntervalHatchYConnection(mesh,get_mesh_hexagonal_subarea_.layers_integer_ ,get_mesh_hexagonal_subarea_.boubding_hexagons_in_layers_interger_);
+		get_interval_hatches_.getIntervalHatchYConnection(mesh,get_mesh_hexagonal_subarea_.layers_integer_ ,get_mesh_hexagonal_subarea_.interior_hexagons_in_layers_interger_);
 	} 
 	else
 	{
 		get_interval_hatches_.get0ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
 		get_interval_hatches_.get60ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
 		get_interval_hatches_.get120ParallelLines(mesh.mesh_slicing_, get_mesh_hexagonal_subarea_.scale);
-		get_interval_hatches_.getIntervalHatchTriangles(mesh);
+
+		if (interval_hatches_cross_subsectors_or_not_)
+		{
+			get_interval_hatches_.getIntervalHatchTrianglesCrossedSubsectors(mesh,get_mesh_hexagonal_subarea_.intervals_with_negative_offseted_subsectors_);
+		} 
+		else
+		{	
+			get_interval_hatches_.getIntervalHatchTriangles(mesh);
+		}
+	
 	}
 	get_interval_hatches_._0_parallel_lines_.swap(std::vector<Paths>());//free the memory 3.23.2017
 	get_interval_hatches_._60_parallel_lines_.swap(std::vector<Paths>());//free the memory 3.23.2017
@@ -129,6 +150,7 @@ void ScanPathPlan::initParameters()
 		true, 1.0e-9, 1.0e8);
 
 	parameter_set_->addParameter(QString("Offset contours"), false, QString("Offset contours"), QString("Offset contours or not."));
+	parameter_set_->addParameter(QString("Interval hathces cross then subsectors"), false, QString("Interval hathces cross then subsectors"), QString("Interval hathces cross then subsectors or not."));
 	parameter_set_->addParameter(QString("Staggered subsectors between layers"), false, QString("Staggered subsectors between layers"), QString("Subsectors staggered or not bwetween layers."));
 	parameter_set_->addParameter(QString("Side Length of Rounding hexagon"), 4.0, QString("SL of RH ="), QString("The side length of rounding hexagon."),
 		true, 1.0e-9, 1.0e8);
@@ -141,6 +163,7 @@ void ScanPathPlan::initParameters()
 	subsector_hatches_style.push_back(QString("undirectional hatches"));
 	subsector_hatches_style.push_back(QString("triangular parallel hatches between 3 adjacent layers"));
 	subsector_hatches_style.push_back(QString("triangular parallel hatches between 3 adjacent columns"));//5.12.2017
+	subsector_hatches_style.push_back(QString("triangular hatches"));//5.18.2017
 	parameter_set_->addParameter(QString("Subsector hatches style"), subsector_hatches_style, 0, QString("Subsector hatches style"), QString("The style of subsector hatches."));
 
 	parameter_set_->addParameter(QString("Parallel Line Spacing of Hexagonal Subareas"), 0.03, QString("PLS of HS ="), QString("Parallel Line Spacing of Hexagonal Subareas"), 
