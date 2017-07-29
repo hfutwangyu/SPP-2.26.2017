@@ -14,6 +14,7 @@ GetHexagonalSubarea::~GetHexagonalSubarea()
 void GetHexagonalSubarea::transformLayersDataTypeToInteger(TriMesh::Slicing &slice_of_mesh_)
 //////////////change layers data type from double to cInt
 {
+	layers_integer_.swap(std::vector<Paths>());
 	for (auto contours_it = slice_of_mesh_.begin(); contours_it != slice_of_mesh_.end();contours_it++)
 	{
 		TriMesh::Contours layer_contours = *contours_it;
@@ -390,11 +391,81 @@ void GetHexagonalSubarea::getOuterContoursofEachLayer(TriMesh::Slicing &slice_of
 		}
 
 		layer_outer_contours_.push_back(outer_contours_of_a_alyer_);
+
+		//////////////////////////////////////////////////////////////////////////
+		//layer contours without outer contours
+
+		Paths one_layer_contours, temp_one_layer_contours;
+		ClosedPathsFromPolyTree(solution, one_layer_contours);
+
+		//////////////////////////////////////////////////////////////////////////
+		///6.22.2017
+/*
+		for (int  j = 0; j< one_layer_contours.size();j++)
+		{
+			Path contour = one_layer_contours[j];
+			IntPoint spt = contour.front(),
+				     ept = contour.back();
+			for (int k = 0; k < n; k++)
+			{
+				Path one_outer_contour_of_a_alyer_ = solution.Childs[k]->Contour;
+				IntPoint start_pt = one_outer_contour_of_a_alyer_.front(),
+					end_pt = one_outer_contour_of_a_alyer_.back();
+				if ((one_outer_contour_of_a_alyer_.size() == contour.size()) &&
+					(sqrt(pow((spt.X - start_pt.X), 2) + pow((spt.Y - start_pt.Y), 2)) < 1.0e-9*scale) &&
+					(sqrt(pow((ept.X - end_pt.X), 2) + pow((ept.Y - end_pt.Y), 2)) < 1.0e-9*scale))
+				{
+				}
+				else
+				{
+					temp_one_layer_contours.push_back(contour);
+				}
+			}
+		}
+ */
+
+		//////////////////////////////////////////////////////////////////////////
+		//7.15.2017
+		temp_one_layer_contours = one_layer_contours;
+		for (int j = 0; j < one_layer_contours.size(); j++)
+		{
+			Path contour = one_layer_contours[j];
+			IntPoint spt = contour.front(),
+				ept = contour.back();
+			for (int k = 0; k < n; k++)
+			{
+				Path one_outer_contour_of_a_alyer_ = solution.Childs[k]->Contour;
+				IntPoint start_pt = one_outer_contour_of_a_alyer_.front(),
+					end_pt = one_outer_contour_of_a_alyer_.back();
+				if ((one_outer_contour_of_a_alyer_.size() == contour.size()) &&
+					(sqrt(pow((spt.X - start_pt.X), 2) + pow((spt.Y - start_pt.Y), 2)) < 1.0e-9*scale) &&
+					(sqrt(pow((ept.X - end_pt.X), 2) + pow((ept.Y - end_pt.Y), 2)) < 1.0e-9*scale))
+				{
+					for (auto it = temp_one_layer_contours.begin(); it != temp_one_layer_contours.end();it++)
+					{
+						Path one_outer_contour_of_temp_layer_contours_ = *it;
+						IntPoint temp_start_pt = one_outer_contour_of_temp_layer_contours_.front(),
+							temp_end_pt = one_outer_contour_of_temp_layer_contours_.back();
+						if ((one_outer_contour_of_temp_layer_contours_.size() == contour.size()) &&
+							(sqrt(pow((spt.X - temp_start_pt.X), 2) + pow((spt.Y - temp_start_pt.Y), 2)) < 1.0e-9*scale) &&
+							(sqrt(pow((ept.X - temp_end_pt.X), 2) + pow((ept.Y - temp_end_pt.Y), 2)) < 1.0e-9*scale))
+						{
+							temp_one_layer_contours.erase(it);
+							break;
+						}
+					}
+				}
+			}
+		}
+
+
+		layer_contours_without_outer_contours.push_back(temp_one_layer_contours);
+
 	}
 }
 
 
-void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
+void GetHexagonalSubarea::segmenLayersIntoHexagonalSubareasWithBoundryOffset(TriMesh &mesh, TriMesh::Slicing &slice_of_mesh_)
 {
 	//transformLayersDataTypeToInteger(slice_of_mesh_);
 	//getHexagons(slice_of_mesh_);///////get hexagons in each layer
@@ -585,7 +656,7 @@ void GetHexagonalSubarea::getOffsettedOuterContours(TriMesh::Slicing &slice_of_m
 						co.AddPath(contour, jtMiter, etClosedPolygon);
 						co.Execute(solution, (0.0-offset)*scale);
 
-						Path offsetted_outer_contour_;
+						Path offsetted_outer_contour_;/////????? something wrong 
 						if (solution.size() == 1)
 						{
 							offsetted_outer_contour_ = solution[0];
@@ -724,4 +795,178 @@ void GetHexagonalSubarea::offsetIntervalContoursWithIntervals(Paths &contours_in
 		}
 
 	}
+}
+
+
+void GetHexagonalSubarea::volumeOffset(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_)
+{
+	TriMesh::Slicing temp_volume_offset_slice_of_mesh_;
+
+	if (layer_outer_contours_.size()==layer_contours_without_outer_contours.size()&&
+		layer_outer_contours_.size()==slice_of_mesh_.size())
+	{
+		for (int i = 0; i < layer_outer_contours_.size();i++)
+		{
+			if (i!=layer_outer_contours_.size()-1)
+			{
+				Paths One_layer_outer_contours_ = layer_outer_contours_[i];
+				Paths next_One_layer_outer_contours_ = layer_outer_contours_[i + 1];
+
+				//////////////////////////////////////////////////////////////////////////
+				////6.22.2017
+				
+				Clipper C;
+				Paths solution;
+				C.AddPaths(One_layer_outer_contours_, ptSubject, true);
+				C.AddPaths(next_One_layer_outer_contours_, ptClip, true);
+				C.Execute(ctUnion, solution, pftEvenOdd, pftEvenOdd);
+				
+
+				//////////////////////////////////////////////////////////////////////////
+				///7.15.2017
+	/*			Paths solution=One_layer_outer_contours_;
+				
+				for (int k = 0; k < next_One_layer_outer_contours_.size();k++)
+				{
+					Path one_contour_of_next_One_layer_outer_contours_ = next_One_layer_outer_contours_[k];
+					Clipper C;
+					C.AddPaths(solution, ptSubject, true);
+					C.AddPath(one_contour_of_next_One_layer_outer_contours_, ptClip, true);
+					C.Execute(ctUnion, solution, pftEvenOdd, pftEvenOdd);
+				}
+				*/
+				//////////////////////////////////////////////////////////////////////////
+				/////6.22.2017
+		       	/*	
+		        Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i];
+				for (int j = 0; j < solution.size(); j++)
+				{
+					Path one_volume_offset_outer_layer = solution[j];
+					one_layer_contours_without_outer_contours_.push_back(one_volume_offset_outer_layer);
+				}
+
+				volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+				*/
+				//////////////////////////////////////////////////////////////////////////
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/////7.14.2017
+	            /*
+				if ((solution.size()>One_layer_outer_contours_.size())&&
+					(solution.size()>next_One_layer_outer_contours_.size()))
+				{
+					if (One_layer_outer_contours_.size()>=next_One_layer_outer_contours_.size())
+					{
+						Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i];
+						for (int j = 0; j < One_layer_outer_contours_.size(); j++)
+						{
+							Path one_outer_contour_ = One_layer_outer_contours_[j];
+							one_layer_contours_without_outer_contours_.push_back(one_outer_contour_);
+						}
+						volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+					} 
+					else
+					{
+						Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i];
+						for (int j = 0; j < next_One_layer_outer_contours_.size(); j++)
+						{
+							Path one_outer_contour_ = next_One_layer_outer_contours_[j];
+							one_layer_contours_without_outer_contours_.push_back(one_outer_contour_);
+						}
+						volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+					}
+				} 
+				else
+				{
+					Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i];
+					for (int j = 0; j < solution.size(); j++)
+					{
+						Path one_volume_offset_outer_layer = solution[j];
+						one_layer_contours_without_outer_contours_.push_back(one_volume_offset_outer_layer);
+					}
+
+					volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+				}
+			    */
+
+				//////////////////////////////////////////////////////////////////////////
+				///7.29.2017
+				Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i],
+					  next_one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i+1];
+
+				if (one_layer_contours_without_outer_contours_.size()!=0)
+				{
+					for (int j = 0; j < solution.size(); j++)
+					{
+						Path one_volume_offset_outer_layer = solution[j];
+						one_layer_contours_without_outer_contours_.push_back(one_volume_offset_outer_layer);
+					}
+					volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+				} 
+				else
+				{
+					for (int j = 0; j < solution.size(); j++)
+					{
+						Path one_volume_offset_outer_layer = solution[j];
+						next_one_layer_contours_without_outer_contours_.push_back(one_volume_offset_outer_layer);
+					}
+					volume_offset_layers_integer.push_back(next_one_layer_contours_without_outer_contours_);
+				}
+	
+				//////////////////////////////////////////////////////////////////////////
+				//6.22.2017
+				//volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+			} 
+			else
+			{
+				Paths One_layer_outer_contours_ = layer_outer_contours_[i];
+				Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i];
+				for (int j = 0; j < One_layer_outer_contours_.size(); j++)
+				{
+					Path one_outer_contour_ = One_layer_outer_contours_[j];
+					one_layer_contours_without_outer_contours_.push_back(one_outer_contour_);
+				}
+				volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+			}
+ 
+		}
+	   
+
+		//////////////////////////////////////////////////////////////////////////
+		//transform volume_offset_layers_integer into mesh slicing data
+		for (int i = 0; i < volume_offset_layers_integer.size(); i++)
+		{
+
+			double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+
+			Paths one_volume_offset_contours_integer_ = volume_offset_layers_integer[i];
+			TriMesh::Contours one_volume_offset_contours_;
+			for (int j = 0; j < one_volume_offset_contours_integer_.size();j++)
+			{
+				Path one_volume_offset_contour_integer_ = one_volume_offset_contours_integer_[j];
+				TriMesh::Polylines one_volume_offset_contour_;
+				for (int k = 0; k < one_volume_offset_contour_integer_.size();k++)
+				{
+					IntPoint intpt = one_volume_offset_contour_integer_[k];
+					TriMesh::Point pt;
+					pt[0] = (double)intpt.X / scale;
+					pt[1] = (double)intpt.Y / scale;
+					pt[2] = z;
+					one_volume_offset_contour_.push_back(pt);
+				}
+				one_volume_offset_contours_.push_back(one_volume_offset_contour_);
+			}
+			temp_volume_offset_slice_of_mesh_.push_back(one_volume_offset_contours_);
+		}
+		slice_of_mesh_.swap(temp_volume_offset_slice_of_mesh_);
+
+		//////////////////////////////////////////////////////////////////////////
+		///release memory
+		layer_outer_contours_.swap(std::vector<Paths>());
+		layer_contours_without_outer_contours.swap(std::vector<Paths>());//6.22.2017
+		volume_offset_layers_integer.swap(std::vector<Paths>());//6.22.2017
+	} 
+	else exit(1);
+
 }

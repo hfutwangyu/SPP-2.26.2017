@@ -24,14 +24,24 @@ void ScanPathPlan::denoise()
 
 	GetHexagonalSubarea get_mesh_hexagonal_subarea_;
 	bool subsectors_staggered_or_not_;
+	bool volume_offset_or_not_;
 	bool offset_contours_or_not_;
 	parameter_set_->getValue(QString("Staggered subsectors between layers"), subsectors_staggered_or_not_);
+	parameter_set_->getValue(QString("Volume Offset"), volume_offset_or_not_);
 	parameter_set_->getValue(QString("Offset contours"), offset_contours_or_not_);
 	parameter_set_->getValue(QString("Side Length of Rounding hexagon"), get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 	parameter_set_->getValue(QString("Side Length of hexagonal subarea"), get_mesh_hexagonal_subarea_.side_length_of_hexagon);
 	parameter_set_->getValue(QString("Transformation ration between double data and cInt data"), get_mesh_hexagonal_subarea_.scale);
 	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_mesh_hexagonal_subarea_.parallel_line_spacing);
 	parameter_set_->getValue(QString("Offset"), get_mesh_hexagonal_subarea_.offset);
+
+	get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
+	if (volume_offset_or_not_)
+	{
+		get_mesh_hexagonal_subarea_.getOuterContoursofEachLayer(mesh.mesh_slicing_);//6.22.2017
+		get_mesh_hexagonal_subarea_.volumeOffset(slice_of_date_manager, mesh.mesh_slicing_);//6.22.2017
+	}
+
 	get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
 	if (subsectors_staggered_or_not_)
 	{
@@ -44,7 +54,7 @@ void ScanPathPlan::denoise()
 
 	if (offset_contours_or_not_)
 	{
-		get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareasWithOuterBoundryOffset(mesh, mesh.mesh_slicing_);//get hexagonal subareas with offsetted boundary 5.2.2017
+		get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareasWithBoundryOffset(mesh, mesh.mesh_slicing_);//get hexagonal subareas with offsetted boundary 5.2.2017
 	} 
 	else
 	{
@@ -148,6 +158,8 @@ void ScanPathPlan::initParameters()
 	parameter_set_->removeAllParameter();
 	parameter_set_->addParameter(QString("Layer Thickness"), 1.1, QString("Layer Thickness ="), QString("The layer thickness of the sliced model."),
 		true, 1.0e-9, 1.0e8);
+
+	parameter_set_->addParameter(QString("Volume Offset"), false, QString("Volume Offset"), QString("Volume Offset or not."));//6.22.2017
 
 	parameter_set_->addParameter(QString("Offset contours"), false, QString("Offset contours"), QString("Offset contours or not."));
 	parameter_set_->addParameter(QString("Interval hathces cross then subsectors"), false, QString("Interval hathces cross then subsectors"), QString("Interval hathces cross then subsectors or not."));
