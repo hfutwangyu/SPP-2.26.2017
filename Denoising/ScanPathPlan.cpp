@@ -1,4 +1,6 @@
 #include "ScanPathPlan.h"
+//#include <time.h>
+#include <MyTimer.h>
 
 
 ScanPathPlan::ScanPathPlan(DataManager *_data_manager, ParameterSet *_parameter_set)
@@ -16,11 +18,19 @@ void ScanPathPlan::denoise()
 {
 	TriMesh mesh = data_manager_->getNoisyMesh();
 	Slice slice_of_date_manager;
+	MyTimer slice_timer;//add for slicing duration 9.4.2017
+	double slice_duration;//add for slicing duration 9.4.2017
 	parameter_set_->getValue(QString("Layer Thickness"), slice_of_date_manager.thickness);
 	slice_of_date_manager.SliceTheModel(mesh);
+	mesh.mesh_layer_thickness_ = slice_of_date_manager.thickness;//add for mesh staircase display 8.31.2017
 	mesh.mesh_slicing_ = slice_of_date_manager.slicing;//SET THE SLICING DATA OF THE MESH
+	slice_timer.Start();
 	getSlicedLayers(mesh,slice_of_date_manager);//get each layer's position 3.22.2017
-
+	slice_timer.End();
+	slice_duration = (double)slice_timer.costTime;
+	std::ofstream Timing("C:\\Users\\zhangzhen\\Desktop\\Timing.txt", std::ios::out | std::ios::trunc);
+	Timing << "slice timing:" << slice_duration << " microseconds.\n";
+	
 
 	GetHexagonalSubarea get_mesh_hexagonal_subarea_;
 	bool subsectors_staggered_or_not_;
@@ -146,6 +156,8 @@ void ScanPathPlan::denoise()
 	//transformIntervalsHatchesFromCIntToDouble(mesh, slice_of_date_manager, get_mesh_hexagonal_subarea_);//change the data type from CInt to double
 	data_manager_->setMesh(mesh);
 	data_manager_->setDenoisedMesh(mesh);
+
+	Timing.close();//9.45.2017
 }
 
 void ScanPathPlan::getPlanPath()

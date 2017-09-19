@@ -37,6 +37,10 @@ public:
 		draw_hexagons_status_ = _val;
 	}
 
+	void setDrawStairacase(bool _val){
+		draw_staircase_ = _val;
+	}
+
 	void setDrawIntervalsStatus(bool _val){///add 3.14.2017
 		draw_intervals_status_ = _val;
 	}
@@ -58,6 +62,7 @@ protected:
     bool draw_points_status_;
     bool draw_edges_status_;
     bool draw_faces_status_;
+	bool draw_staircase_;//add for staircase 8.31.2017
 	bool draw_layers_status_;//add for slice layers 3-8-2017
 	bool draw_hexagons_status_;//add for hexagonal subarea 3-8-2017
 	bool draw_intervals_status_;//sdd for intervals 3.14.2017

@@ -108,6 +108,11 @@ void MainWindow::CreateActions()
 	//action_render_layers_->setChecked(true);
 	connect(action_render_layers_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawLayersStatus(bool)));
 
+	action_render_staircase_ = new QAction(QIcon("staircase.ico"), tr("Render Staircase"), this);//add for staircase 8-31-2017
+	action_render_staircase_->setStatusTip("Render Stairacase.");
+	action_render_staircase_->setCheckable(true);
+	connect(action_render_staircase_, SIGNAL(toggled(bool)), opengl_viewer_, SLOT(setDrawStaircase(bool)));
+
 	action_render_hexagonal_subareas_ = new QAction(QIcon("hexagon.ico"), tr("Render Hexagonal Subareas"), this);//add for hexagonal subareas 3-9-2017
 	action_render_hexagonal_subareas_->setStatusTip("Render Hexagonal Subareas.");
 	action_render_hexagonal_subareas_->setCheckable(true);
@@ -232,7 +237,8 @@ void MainWindow::CreateToolBars()
 	toolbar_opengl_info_->addAction(action_render_points_);
 	toolbar_opengl_info_->addAction(action_render_edges_);
 	toolbar_opengl_info_->addAction(action_render_faces_);
-	toolbar_opengl_info_->addAction(action_render_layers_);//add for layers 3-8-2017
+	toolbar_opengl_info_->addAction(action_render_staircase_);//add for staircase 8.31.2017
+	toolbar_opengl_info_->addAction(action_render_layers_);//add for layers 8-31-2017
 	toolbar_opengl_info_->addAction(action_render_hexagonal_subareas_);//add for hexagonal subareas 3-8-2017
 	toolbar_opengl_info_->addAction(action_render_intervals_);//add for intervals 3-14-2017
 	toolbar_opengl_info_->addAction(action_render_hexagonal_subareas_parallel_hatches_);//add for hexagonal subareas parallel hatches 3-15-2017

@@ -88,6 +88,7 @@ private:
 	QAction *action_render_points_;
 	QAction *action_render_edges_;
 	QAction *action_render_faces_;
+	QAction *action_render_staircase_;//add for layers 8-31-2017
 	QAction *action_render_layers_;//add for layers 3-8-2017
 	QAction *action_render_hexagonal_subareas_;//add for hexagonal subareas 3-8-2017
 	QAction *action_render_intervals_;//add for intervals 3.14.2017

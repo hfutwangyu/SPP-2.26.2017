@@ -824,6 +824,7 @@ namespace OpenMesh {
 		IntervalHatchesDouble mesh_interval_hatches_double_;
 
 		Layers mesh_layers_;//add for each layer's position 3.22.2017
+		double mesh_layer_thickness_;//add for staircase display 8.31.2017
 	private:
 		//standard vertex properties
 		PointsPropertyHandle                      points_;

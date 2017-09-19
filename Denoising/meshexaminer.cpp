@@ -7,7 +7,7 @@
 MeshExaminer::MeshExaminer()
 :draw_points_status_(false), draw_edges_status_(false), draw_faces_status_(true), draw_layers_status_(false), 
 draw_hexagons_status_(false),draw_intervals_status_(false),draw_parallel_hatches_status_(false), show_single_layer_number_(-1),
-draw_interval_triangles_hatches_status_(false)
+draw_interval_triangles_hatches_status_(false), draw_staircase_(false)
 {
 
 }
@@ -127,6 +127,7 @@ void MeshExaminer::draw()
 				TriMesh::Polylines z_polyline = *contours_iterator;
 				glLineWidth(3);
 				glBegin(GL_LINE_LOOP);
+				//glBegin(GL_POLYGON);
 				for (auto polyline_iterator = z_polyline.begin(); polyline_iterator != z_polyline.end(); polyline_iterator++)
 				{
 					TriMesh::Point p = *polyline_iterator;
@@ -135,8 +136,57 @@ void MeshExaminer::draw()
 					glVertex3f(p[0], p[1], p[2]);
 				}
 				glEnd();
+				
 			}
 		}
+	}
+
+	if (draw_staircase_)
+	{
+		
+		for (auto slicing_iterator = mesh_show_.mesh_slicing_.begin(); slicing_iterator != mesh_show_.mesh_slicing_.end(); slicing_iterator++)
+		{
+			TriMesh::Contours z_contours = *slicing_iterator;
+			for (auto contours_iterator = z_contours.begin(); contours_iterator != z_contours.end(); contours_iterator++)
+			{
+				TriMesh::Polylines z_polyline = *contours_iterator;
+				//////////////////////////////////////////////////////////////////////////
+				//add for staircase display8.32.2017
+				glBegin(GL_QUAD_STRIP);
+				for (auto polyline_iterator = z_polyline.begin(); polyline_iterator != z_polyline.end(); polyline_iterator++)
+				{
+					//TriMesh::Point p = *polyline_iterator;
+					//TriMesh::Point temp_p = p;
+					//temp_p[2] += mesh_show_.mesh_layer_thickness_;
+					//TriMesh::Point pp = temp_p;
+					////glLineWidth(10);
+					//glBegin(GL_LINES);
+					//glColor3f(1.0f, 0.3f, 0.3f);
+					//glVertex3f(p[0], p[1], p[2]);
+					//glVertex3f(pp[0], pp[1], pp[2]);
+					//glEnd();
+
+						TriMesh::Point p1 = *polyline_iterator;
+						TriMesh::Point temp_p1 = p1;
+						temp_p1[2] += mesh_show_.mesh_layer_thickness_;
+						TriMesh::Point pp1 = temp_p1;
+						glColor3f(1.0f, 0.3f, 0.3f);
+						glVertex3f(p1[0], p1[1], p1[2]);
+						glVertex3f(pp1[0], pp1[1], pp1[2]);
+				}
+
+				auto polyline_iterator1 = z_polyline.begin();
+				TriMesh::Point p1 = *polyline_iterator1;
+				TriMesh::Point temp_p1 = p1;
+				temp_p1[2] += mesh_show_.mesh_layer_thickness_;
+				TriMesh::Point pp1 = temp_p1;
+				glColor3f(1.0f, 0.3f, 0.3f);
+				glVertex3f(p1[0], p1[1], p1[2]);
+				glVertex3f(pp1[0], pp1[1], pp1[2]);
+				glEnd();
+			}
+		}
+		
 	}
 
 	if (draw_hexagons_status_)

@@ -190,6 +190,7 @@
     <ClInclude Include="GetHexagonalSubarea.h" />
     <ClInclude Include="GetHexagonHatches.h" />
     <ClInclude Include="GetIntervalHatches.h" />
+    <ClInclude Include="MyTimer.h" />
     <ClInclude Include="ScanPathPlan.h" />
     <ClInclude Include="Slice.h" />
     <CustomBuild Include="calculationthread.h">

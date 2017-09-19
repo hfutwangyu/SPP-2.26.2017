@@ -38,6 +38,11 @@ public slots:
         this->updateGL();
     }
 
+	void setDrawStaircase(bool _val){//add for layers 3-8-2017
+		examiner_->setDrawStairacase(_val);
+		this->updateGL();
+	}
+
 	void setDrawLayersStatus(bool _val){//add for layers 3-8-2017
 		examiner_->setDrawLayersStatus(_val);
 		this->updateGL();
