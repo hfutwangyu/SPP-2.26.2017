@@ -800,7 +800,7 @@ void GetHexagonalSubarea::offsetIntervalContoursWithIntervals(Paths &contours_in
 
 void GetHexagonalSubarea::volumeOffset(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_)
 {
-	TriMesh::Slicing temp_volume_offset_slice_of_mesh_;
+	
 
 	if (layer_outer_contours_.size()==layer_contours_without_outer_contours.size()&&
 		layer_outer_contours_.size()==slice_of_mesh_.size())
@@ -931,42 +931,47 @@ void GetHexagonalSubarea::volumeOffset(Slice &slice_of_date_manager, TriMesh::Sl
 			}
  
 		}
-	   
-
-		//////////////////////////////////////////////////////////////////////////
-		//transform volume_offset_layers_integer into mesh slicing data
-		for (int i = 0; i < volume_offset_layers_integer.size(); i++)
-		{
-
-			double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
-
-			Paths one_volume_offset_contours_integer_ = volume_offset_layers_integer[i];
-			TriMesh::Contours one_volume_offset_contours_;
-			for (int j = 0; j < one_volume_offset_contours_integer_.size();j++)
-			{
-				Path one_volume_offset_contour_integer_ = one_volume_offset_contours_integer_[j];
-				TriMesh::Polylines one_volume_offset_contour_;
-				for (int k = 0; k < one_volume_offset_contour_integer_.size();k++)
-				{
-					IntPoint intpt = one_volume_offset_contour_integer_[k];
-					TriMesh::Point pt;
-					pt[0] = (double)intpt.X / scale;
-					pt[1] = (double)intpt.Y / scale;
-					pt[2] = z;
-					one_volume_offset_contour_.push_back(pt);
-				}
-				one_volume_offset_contours_.push_back(one_volume_offset_contour_);
-			}
-			temp_volume_offset_slice_of_mesh_.push_back(one_volume_offset_contours_);
-		}
-		slice_of_mesh_.swap(temp_volume_offset_slice_of_mesh_);
 
 		//////////////////////////////////////////////////////////////////////////
 		///release memory
 		layer_outer_contours_.swap(std::vector<Paths>());
 		layer_contours_without_outer_contours.swap(std::vector<Paths>());//6.22.2017
-		volume_offset_layers_integer.swap(std::vector<Paths>());//6.22.2017
 	} 
 	else exit(1);
 
+}
+
+
+void GetHexagonalSubarea::transformVolumeOffsetLayersDataTypeToDouble(Slice &slice_of_date_manager, std::vector<Paths> &volume_offset_layers_integer, TriMesh::Slicing &slice_of_mesh_)
+{
+	TriMesh::Slicing temp_volume_offset_slice_of_mesh_;
+
+	//////////////////////////////////////////////////////////////////////////
+	//transform volume_offset_layers_integer into mesh slicing data
+	for (int i = 0; i < volume_offset_layers_integer.size(); i++)
+	{
+
+		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+
+		Paths one_volume_offset_contours_integer_ = volume_offset_layers_integer[i];
+		TriMesh::Contours one_volume_offset_contours_;
+		for (int j = 0; j < one_volume_offset_contours_integer_.size(); j++)
+		{
+			Path one_volume_offset_contour_integer_ = one_volume_offset_contours_integer_[j];
+			TriMesh::Polylines one_volume_offset_contour_;
+			for (int k = 0; k < one_volume_offset_contour_integer_.size(); k++)
+			{
+				IntPoint intpt = one_volume_offset_contour_integer_[k];
+				TriMesh::Point pt;
+				pt[0] = (double)intpt.X / scale;
+				pt[1] = (double)intpt.Y / scale;
+				pt[2] = z;
+				one_volume_offset_contour_.push_back(pt);
+			}
+			one_volume_offset_contours_.push_back(one_volume_offset_contour_);
+		}
+		temp_volume_offset_slice_of_mesh_.push_back(one_volume_offset_contours_);
+	}
+	//slice_of_mesh_.swap(temp_volume_offset_slice_of_mesh_);
+	slice_of_mesh_ = temp_volume_offset_slice_of_mesh_;
 }

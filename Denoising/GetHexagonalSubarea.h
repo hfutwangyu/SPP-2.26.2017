@@ -2,7 +2,7 @@
 #define HEXAGONALSUBAREA_H
 
 #include "Slice.h"
-#include "Clipper/clipper.hpp"
+//#include "Clipper/clipper.hpp"
 using namespace ClipperLib;
 class GetHexagonalSubarea
 {
@@ -47,6 +47,7 @@ public:
 	double offset=0.1;
 	double parallel_line_spacing = 0.4;
 	
+	void transformVolumeOffsetLayersDataTypeToDouble(Slice &slice_of_date_manager, std::vector<Paths> &volume_offset_layers_integer, TriMesh::Slicing &slice_of_mesh_);
 };
 
 #endif // HEXAGONALSUBAREA_H

@@ -17,20 +17,10 @@ ScanPathPlan::~ScanPathPlan()
 void ScanPathPlan::denoise()
 {
 	TriMesh mesh = data_manager_->getNoisyMesh();
+
+
 	Slice slice_of_date_manager;
-	MyTimer slice_timer;//add for slicing duration 9.4.2017
-	double slice_duration;//add for slicing duration 9.4.2017
 	parameter_set_->getValue(QString("Layer Thickness"), slice_of_date_manager.thickness);
-	slice_of_date_manager.SliceTheModel(mesh);
-	mesh.mesh_layer_thickness_ = slice_of_date_manager.thickness;//add for mesh staircase display 8.31.2017
-	mesh.mesh_slicing_ = slice_of_date_manager.slicing;//SET THE SLICING DATA OF THE MESH
-	slice_timer.Start();
-	getSlicedLayers(mesh,slice_of_date_manager);//get each layer's position 3.22.2017
-	slice_timer.End();
-	slice_duration = (double)slice_timer.costTime;
-	std::ofstream Timing("C:\\Users\\zhangzhen\\Desktop\\Timing.txt", std::ios::out | std::ios::trunc);
-	Timing << "slice timing:" << slice_duration << " microseconds.\n";
-	
 
 	GetHexagonalSubarea get_mesh_hexagonal_subarea_;
 	bool subsectors_staggered_or_not_;
@@ -45,17 +35,42 @@ void ScanPathPlan::denoise()
 	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_mesh_hexagonal_subarea_.parallel_line_spacing);
 	parameter_set_->getValue(QString("Offset"), get_mesh_hexagonal_subarea_.offset);
 
+
+	//////////////////////////////////////////////////////////////////////////
+	///////////////////          slice          ////////////////////////////// 
+    MyTimer slice_timer;//add for slicing duration 9.4.2017
+	double slice_duration;//add for slicing duration 9.4.2017
+	slice_timer.Start();
+	slice_of_date_manager.SliceTheModel(mesh);
+	slice_timer.End();
+	slice_duration = (double)slice_timer.costTime;
+	std::ofstream Timing("C:\\Users\\zhangzhen\\Desktop\\Timing.txt", std::ios::out | std::ios::trunc);
+	Timing << "slice timing:" << slice_duration << " microseconds.\n";
+
+	mesh.mesh_layer_thickness_ = slice_of_date_manager.thickness;//add for mesh staircase display 8.31.2017
+	mesh.mesh_slicing_ = slice_of_date_manager.slicing;//SET THE SLICING DATA OF THE MESH
+	getSlicedLayers(mesh,slice_of_date_manager);//get each layer's position 3.22.2017
+
+
+	//////////////////////////////////////////////////////////////////////////
+	///////////////////        honeycomb        //////////////////////////////                       
 	get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
 	if (volume_offset_or_not_)
 	{
 		get_mesh_hexagonal_subarea_.getOuterContoursofEachLayer(mesh.mesh_slicing_);//6.22.2017
 		get_mesh_hexagonal_subarea_.volumeOffset(slice_of_date_manager, mesh.mesh_slicing_);//6.22.2017
+		slice_of_date_manager.sliceTheModelWithThinkingAboutTrianglesBetween2Layers(mesh, get_mesh_hexagonal_subarea_.volume_offset_layers_integer,get_mesh_hexagonal_subarea_.scale);//9.20.2017
+		get_mesh_hexagonal_subarea_.transformVolumeOffsetLayersDataTypeToDouble(slice_of_date_manager, get_mesh_hexagonal_subarea_.volume_offset_layers_integer, mesh.mesh_slicing_);
+
+		//get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
+		get_mesh_hexagonal_subarea_.layers_integer_ = get_mesh_hexagonal_subarea_.volume_offset_layers_integer;
+
+		get_mesh_hexagonal_subarea_.volume_offset_layers_integer.swap(std::vector<Paths>());//6.22.2017
 	}
 
-	get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
 	if (subsectors_staggered_or_not_)
 	{
-		get_mesh_hexagonal_subarea_.getHexagonsStaggeredBetweenLayers(mesh.mesh_slicing_);//get hexagons starggered between layers 4.22.2017
+		get_mesh_hexagonal_subarea_.getHexagonsStaggeredBetweenLayers(mesh.mesh_slicing_);//get hexagons staggered between layers 4.22.2017
 	}
 	else
 	{
@@ -70,11 +85,16 @@ void ScanPathPlan::denoise()
 	{
 		get_mesh_hexagonal_subarea_.segmenLayersIntoHexagonalSubareas(mesh, mesh.mesh_slicing_);//get hexagonal subareas with cInt data type
 	}
-    get_mesh_hexagonal_subarea_.getLayerContoursOrientation(mesh, slice_of_date_manager.slicing);
+	get_mesh_hexagonal_subarea_.getLayerContoursOrientation(mesh, mesh.mesh_slicing_);
+
 	//get_mesh_hexagonal_subarea_.layers_integer_.swap(std::vector<Paths> ());//free the memory 3.23.2017
 	get_mesh_hexagonal_subarea_.hexagons_in_layers_interger_.swap(std::vector<Paths>());//free the memory 3.23.2017
 
-	GetHexagonHatches get_hexagon_hatches_;//get parallel line hatches of hexagonal subares
+
+
+	//////////////////////////////////////////////////////////////////////////
+	/////////////           hatches of  honeycomb            /////////////////
+	GetHexagonHatches get_hexagon_hatches_;//get parallel line hatches of hexagonal subareas
 	int subsetor_hatches_style_index_;
 	parameter_set_->getStringListIndex(QString("Subsector hatches style"), subsetor_hatches_style_index_);
 	parameter_set_->getValue(QString("Parallel Line Spacing of Hexagonal Subareas"), get_hexagon_hatches_.parallel_line_spacing);
@@ -115,6 +135,10 @@ void ScanPathPlan::denoise()
 	get_hexagon_hatches_._60_parallel_lines_for_triangular_hatches.swap(std::vector<Paths>());//free the memory 5.18.2017
 	get_hexagon_hatches_._120_parallel_lines_for_triangular_hatches.swap(std::vector<Paths>());//free the memory 5.18.2017
 	
+
+
+	//////////////////////////////////////////////////////////////////////////
+	/////////////     hatches of  honeycomb's intervals     //////////////////
 	GetIntervalHatches get_interval_hatches_;
 	bool interval_hatches_cross_subsectors_or_not_;
 	parameter_set_->getValue(QString("Interval hathces cross then subsectors"), interval_hatches_cross_subsectors_or_not_);
