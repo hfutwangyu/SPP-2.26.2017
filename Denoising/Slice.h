@@ -37,12 +37,13 @@ public:
 public:
 	
 	void getFacetMaxAndMinZ(TriMesh &mesh, TriMesh::FaceIter f_it, double &maximal_z_, double &minimal_z_);
-	void sliceTheModelWithThinkingAboutTrianglesBetween2Layers(TriMesh &mesh, std::vector<Paths> &volume_offset_layers_integer,int &scale);
+	void sliceTheModelWithThinkingAboutTrianglesBetween2Layers_UnionOneByOne(TriMesh &mesh, std::vector<Paths> &volume_offset_layers_integer,int &scale);
 	void getIntersectionIntergerPointOfOneFacetWith2Layers(TriMesh &mesh, TriMesh::FaceIter &f_it, double &layer_z, double &next_layer_z, int &scale, Path &projection_intersection_polygon_);
 	bool isTheEdgeIntersectedwithThelayer(double &frome_z,double &to_z, double &height);
 	void getEdgesIntersectionPointsWithOneLayer(TriMesh::Point &to_vertex, TriMesh::Point &from_vertex, double &height_1_, double &height_2_, std::vector<TriMesh::Point> &intersection_points);
 	void getEdgesIntersectionPointsWithTwoLayers(TriMesh::Point &to_vertex, TriMesh::Point &from_vertex, double &height_1_, double &height_2_, std::vector<TriMesh::Point> &intersection_points);
 	void getEdgesIntersectionPointWithOneLayer(TriMesh::Point &to_vertex, TriMesh::Point &from_vertex, double &height, TriMesh::Point &intersection_point);
+	void sliceTheModelWithThinkingAboutTrianglesBetween2Layers_AllShapesUnionFirst(TriMesh &mesh, std::vector<Paths> &volume_offset_layers_integer, int &scale);
 };
 
 #endif // !SLICE_H

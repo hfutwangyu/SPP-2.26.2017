@@ -162,6 +162,9 @@
     <ClCompile Include="GetIntervalHatches.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SimpleSSP.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithms\BilateralMeshDenoising.h">
@@ -241,6 +244,9 @@
     </ClInclude>
     <ClInclude Include="MyTimer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleSSP.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

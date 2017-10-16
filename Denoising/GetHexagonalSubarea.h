@@ -27,7 +27,7 @@ public:
 	void offsetIntervalContoursWithHexagonSubsectors(Paths &contours_integer, Paths &a_layer_solution_intersection_, Paths &layer_solution_difference_with_offseted_subsectors_);//5.19.2017
 	void offsetIntervalContoursWithIntervals(Paths &contours_integer, Paths &a_layer_solution_difference_, Paths &layer_solution_difference_with_offsected_intervals_);//5.19.2017
 
-	void volumeOffset(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_);//6.22.2017
+	void volumeOffsetOnlyDealingWithOuterContours(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_);//6.22.2017
 public:
 	std::vector<Paths> hexagons_in_layers_interger_;
 	std::vector<Paths> interior_hexagons_in_layers_interger_;//5.16.2017
@@ -48,6 +48,7 @@ public:
 	double parallel_line_spacing = 0.4;
 	
 	void transformVolumeOffsetLayersDataTypeToDouble(Slice &slice_of_date_manager, std::vector<Paths> &volume_offset_layers_integer, TriMesh::Slicing &slice_of_mesh_);
+	void volumeOffsetDealingWithAllContours(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_);
 };
 
 #endif // HEXAGONALSUBAREA_H

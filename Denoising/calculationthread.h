@@ -11,6 +11,7 @@
 #include "Algorithms/MeshDenoisingViaL0Minimization.h"
 #include "Algorithms/GuidedMeshNormalFiltering.h"
 #include "ScanPathPlan.h"
+#include "SimpleSSP.h"
 
 class CalculationThread : public QThread
 {
@@ -20,7 +21,7 @@ public:
 	~CalculationThread();
 
 	enum AlgorithmsType{
-		kNon, kNoise, kBilateralMeshDenoising, kScanPathPlan, kNonIterativeFeaturePreservingMeshFiltering,
+		kNon, kNoise, kBilateralMeshDenoising, kScanPathPlan,kSimpleSPP, kNonIterativeFeaturePreservingMeshFiltering,
 		kFastAndEffectiveFeaturePreservingMeshDenoising, kBilateralNormalFilteringForMeshDenoising,
 		kMeshDenoisingViaL0Minimization, kGuidedMeshNormalFiltering
 	};

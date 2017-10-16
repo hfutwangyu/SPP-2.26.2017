@@ -798,7 +798,7 @@ void GetHexagonalSubarea::offsetIntervalContoursWithIntervals(Paths &contours_in
 }
 
 
-void GetHexagonalSubarea::volumeOffset(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_)
+void GetHexagonalSubarea::volumeOffsetOnlyDealingWithOuterContours(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_)
 {
 	
 
@@ -951,7 +951,8 @@ void GetHexagonalSubarea::transformVolumeOffsetLayersDataTypeToDouble(Slice &sli
 	for (int i = 0; i < volume_offset_layers_integer.size(); i++)
 	{
 
-		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		//double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		double z = (slice_of_date_manager.model_min_z + 0.00001+ i*(slice_of_date_manager.thickness));//10.2.2017
 
 		Paths one_volume_offset_contours_integer_ = volume_offset_layers_integer[i];
 		TriMesh::Contours one_volume_offset_contours_;
@@ -974,4 +975,84 @@ void GetHexagonalSubarea::transformVolumeOffsetLayersDataTypeToDouble(Slice &sli
 	}
 	//slice_of_mesh_.swap(temp_volume_offset_slice_of_mesh_);
 	slice_of_mesh_ = temp_volume_offset_slice_of_mesh_;
+}
+
+
+void GetHexagonalSubarea::volumeOffsetDealingWithAllContours(Slice &slice_of_date_manager, TriMesh::Slicing &slice_of_mesh_)
+{
+
+
+	if (layer_outer_contours_.size() == layer_contours_without_outer_contours.size() &&
+		layer_outer_contours_.size() == slice_of_mesh_.size())
+	{
+		for (int i = 0; i < layer_outer_contours_.size(); i++)
+		{
+			if (i != layer_outer_contours_.size() - 1)
+			{
+				//////////////////////////////////////////////////////////////////////////
+				//outer contours' union
+				Paths One_layer_outer_contours_ = layer_outer_contours_[i];
+				Paths next_One_layer_outer_contours_ = layer_outer_contours_[i + 1];
+				Clipper C_union;
+				Paths unuion_solution;
+				C_union.AddPaths(One_layer_outer_contours_, ptSubject, true);
+				C_union.AddPaths(next_One_layer_outer_contours_, ptClip, true);
+				C_union.Execute(ctUnion, unuion_solution, pftEvenOdd, pftEvenOdd);
+
+				//////////////////////////////////////////////////////////////////////////
+				//inner contours' intersection
+				Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i],
+					next_one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i + 1];
+				Clipper C_inter;
+				Paths inter_solution;
+				C_inter.AddPaths(one_layer_contours_without_outer_contours_, ptSubject, true);
+				C_inter.AddPaths(next_one_layer_contours_without_outer_contours_, ptClip, true);
+				C_inter.Execute(ctIntersection, inter_solution, pftEvenOdd, pftEvenOdd);
+
+				//////////////////////////////////////////////////////////////////////////
+
+				if (inter_solution.size() != 0)
+				{
+					for (int j = 0; j < unuion_solution.size(); j++)
+					{
+						Path one_volume_offset_outer_layer = unuion_solution[j];
+						inter_solution.push_back(one_volume_offset_outer_layer);
+					}
+					volume_offset_layers_integer.push_back(inter_solution);
+				}
+				else
+				{
+					for (int j = 0; j < unuion_solution.size(); j++)
+					{
+						Path one_volume_offset_outer_layer = unuion_solution[j];
+						one_layer_contours_without_outer_contours_.push_back(one_volume_offset_outer_layer);
+					}
+					volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+				}
+
+				//////////////////////////////////////////////////////////////////////////
+				//6.22.2017
+				//volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+			}
+			else
+			{
+				Paths One_layer_outer_contours_ = layer_outer_contours_[i];
+				Paths one_layer_contours_without_outer_contours_ = layer_contours_without_outer_contours[i];
+				for (int j = 0; j < One_layer_outer_contours_.size(); j++)
+				{
+					Path one_outer_contour_ = One_layer_outer_contours_[j];
+					one_layer_contours_without_outer_contours_.push_back(one_outer_contour_);
+				}
+				volume_offset_layers_integer.push_back(one_layer_contours_without_outer_contours_);
+			}
+
+		}
+
+		//////////////////////////////////////////////////////////////////////////
+		///release memory
+		layer_outer_contours_.swap(std::vector<Paths>());
+		layer_contours_without_outer_contours.swap(std::vector<Paths>());//6.22.2017
+	}
+	else exit(1);
+
 }

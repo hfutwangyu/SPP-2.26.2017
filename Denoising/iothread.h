@@ -12,7 +12,7 @@ public:
     ioThread(DataManager *_data_manager);
     ~ioThread();
 
-    enum ioType{kNon, kImport, kExport,kExportCLI};///2.22.2017
+    enum ioType{kNon, kImport, kExport,kExportCLI,KExportCapitalCLI};///2.22.2017//10.2.2017
 
 signals:
     void statusShowMessage(QString);
@@ -24,6 +24,7 @@ public:
     void ImportMesh(QString &file_name);
     void ExportMesh(QString &file_name);
 	void ExportCLI(QString &file_name);//add for export CLI file 3.22.2017
+	void ExportCapitalCLI(QString &file_name);//add for export Capital file 10.2.2017
 public:
     void run();
 

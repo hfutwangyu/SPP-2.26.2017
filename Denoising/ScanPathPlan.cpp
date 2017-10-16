@@ -25,9 +25,11 @@ void ScanPathPlan::denoise()
 	GetHexagonalSubarea get_mesh_hexagonal_subarea_;
 	bool subsectors_staggered_or_not_;
 	bool volume_offset_or_not_;
+	bool volume_offset_with_between_triangles_or_not_;
 	bool offset_contours_or_not_;
 	parameter_set_->getValue(QString("Staggered subsectors between layers"), subsectors_staggered_or_not_);
 	parameter_set_->getValue(QString("Volume Offset"), volume_offset_or_not_);
+	parameter_set_->getValue(QString("Volume Offset and add between triangles"), volume_offset_with_between_triangles_or_not_);
 	parameter_set_->getValue(QString("Offset contours"), offset_contours_or_not_);
 	parameter_set_->getValue(QString("Side Length of Rounding hexagon"), get_mesh_hexagonal_subarea_.side_length_of_bounding_hexagon);
 	parameter_set_->getValue(QString("Side Length of hexagonal subarea"), get_mesh_hexagonal_subarea_.side_length_of_hexagon);
@@ -58,8 +60,13 @@ void ScanPathPlan::denoise()
 	if (volume_offset_or_not_)
 	{
 		get_mesh_hexagonal_subarea_.getOuterContoursofEachLayer(mesh.mesh_slicing_);//6.22.2017
-		get_mesh_hexagonal_subarea_.volumeOffset(slice_of_date_manager, mesh.mesh_slicing_);//6.22.2017
-		slice_of_date_manager.sliceTheModelWithThinkingAboutTrianglesBetween2Layers(mesh, get_mesh_hexagonal_subarea_.volume_offset_layers_integer,get_mesh_hexagonal_subarea_.scale);//9.20.2017
+		//get_mesh_hexagonal_subarea_.volumeOffsetOnlyDealingWithOuterContours(slice_of_date_manager, mesh.mesh_slicing_);//6.22.2017
+		get_mesh_hexagonal_subarea_.volumeOffsetDealingWithAllContours(slice_of_date_manager, mesh.mesh_slicing_);//10.2.2017
+		if (volume_offset_with_between_triangles_or_not_)
+		{
+			slice_of_date_manager.sliceTheModelWithThinkingAboutTrianglesBetween2Layers_UnionOneByOne(mesh, get_mesh_hexagonal_subarea_.volume_offset_layers_integer,get_mesh_hexagonal_subarea_.scale);//9.20.2017
+			//slice_of_date_manager.sliceTheModelWithThinkingAboutTrianglesBetween2Layers_AllShapesUnionFirst(mesh, get_mesh_hexagonal_subarea_.volume_offset_layers_integer, get_mesh_hexagonal_subarea_.scale);//10.1.2017
+		}
 		get_mesh_hexagonal_subarea_.transformVolumeOffsetLayersDataTypeToDouble(slice_of_date_manager, get_mesh_hexagonal_subarea_.volume_offset_layers_integer, mesh.mesh_slicing_);
 
 		//get_mesh_hexagonal_subarea_.transformLayersDataTypeToInteger(mesh.mesh_slicing_);
@@ -196,15 +203,16 @@ void ScanPathPlan::initParameters()
 		true, 1.0e-9, 1.0e8);
 
 	parameter_set_->addParameter(QString("Volume Offset"), false, QString("Volume Offset"), QString("Volume Offset or not."));//6.22.2017
+	parameter_set_->addParameter(QString("Volume Offset and add between triangles"), false, QString("Volume Offset and add between triangles"), QString("Volume Offset and add between triangles or not."));
 
 	parameter_set_->addParameter(QString("Offset contours"), false, QString("Offset contours"), QString("Offset contours or not."));
 	parameter_set_->addParameter(QString("Interval hathces cross then subsectors"), false, QString("Interval hathces cross then subsectors"), QString("Interval hathces cross then subsectors or not."));
 	parameter_set_->addParameter(QString("Staggered subsectors between layers"), false, QString("Staggered subsectors between layers"), QString("Subsectors staggered or not bwetween layers."));
-	parameter_set_->addParameter(QString("Side Length of Rounding hexagon"), 4.0, QString("SL of RH ="), QString("The side length of rounding hexagon."),
+	parameter_set_->addParameter(QString("Side Length of Rounding hexagon"), 2.0, QString("SL of RH ="), QString("The side length of rounding hexagon."),
 		true, 1.0e-9, 1.0e8);
-	parameter_set_->addParameter(QString("Side Length of hexagonal subarea"), 3.0, QString("SL of HS ="), QString("The side length of hexagonal subarea, less than SL of RH."),
+	parameter_set_->addParameter(QString("Side Length of hexagonal subarea"), 1.7, QString("SL of HS ="), QString("The side length of hexagonal subarea, less than SL of RH."),
 		true, 1.0e-9, 1.0e8);
-	parameter_set_->addParameter(QString("Transformation ration between double data and cInt data"), 1000, QString("Scale ="), QString("Double data multiply scale to get cInt data."),
+	parameter_set_->addParameter(QString("Transformation ration between double data and cInt data"), 10000000, QString("Scale ="), QString("Double data multiply scale to get cInt data."),
 		true, 1, 100000000000);
 
 	QStringList subsector_hatches_style;
@@ -214,9 +222,9 @@ void ScanPathPlan::initParameters()
 	subsector_hatches_style.push_back(QString("triangular hatches"));//5.18.2017
 	parameter_set_->addParameter(QString("Subsector hatches style"), subsector_hatches_style, 0, QString("Subsector hatches style"), QString("The style of subsector hatches."));
 
-	parameter_set_->addParameter(QString("Parallel Line Spacing of Hexagonal Subareas"), 0.03, QString("PLS of HS ="), QString("Parallel Line Spacing of Hexagonal Subareas"), 
+	parameter_set_->addParameter(QString("Parallel Line Spacing of Hexagonal Subareas"), 0.11, QString("PLS of HS ="), QString("Parallel Line Spacing of Hexagonal Subareas"), 
 		true, 1.0e-9, 1.0e8);
-	parameter_set_->addParameter(QString("Parallel Line Spacing of Intervals"), 0.03, QString("PLS of Intervals ="), QString("Parallel Line Spacing of Intervals"),
+	parameter_set_->addParameter(QString("Parallel Line Spacing of Intervals"), 0.165, QString("PLS of Intervals ="), QString("Parallel Line Spacing of Intervals"),
 		true, 1.0e-9, 1.0e8);
 	parameter_set_->addParameter(QString("Offset"), 0.2, QString("Offset ="), QString("Contours' Offset"),
 		true, 1.0e-9, 1.0e8);
@@ -229,7 +237,8 @@ void ScanPathPlan::transformMeshSegmentedSlicingfromCIntToDouble(TriMesh &mesh, 
 {
 	for (int i = 0; i < mesh.mesh_hexagoned_hexagons_int_paths_.size(); i++)//segment layers into hexagonal subareas
 	{
-		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		//double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		double z = (slice_of_date_manager.model_min_z + 0.00001+ i *(slice_of_date_manager.thickness));//10.2.2017
 		std::vector<Paths> a_layer_subareas_paths_ = mesh.mesh_hexagoned_hexagons_int_paths_[i];
 		TriMesh::SegmentedLayers mesh_segmented_layers;
 		for (int j = 0; j < a_layer_subareas_paths_.size(); j++)
@@ -266,7 +275,8 @@ void ScanPathPlan::transformHexagonaHatchesFromCIntToDouble(TriMesh &mesh, Slice
 {
 	for (int i = 0; i < mesh.mesh_hexagon_hatches_int_.size();i++)
 	{
-		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		//double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		double z = (slice_of_date_manager.model_min_z +0.00001 + i*(slice_of_date_manager.thickness));//10.2.2017
 		std::vector<Paths> ps_layer = mesh.mesh_hexagon_hatches_int_[i];
 		TriMesh::HatchesForOneLayer hatches_of_a_layer;
 		for (int j = 0; j < ps_layer.size();j++)
@@ -303,7 +313,8 @@ void ScanPathPlan::transformIntervalsHatchesFromCIntToDouble(TriMesh &mesh, Slic
 {
 	for (int i = 0; i < mesh.mesh_interval_hatches_int_.size();i++)
 	{
-		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		//double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		double z = (slice_of_date_manager.model_min_z + 0.00001 + i*(slice_of_date_manager.thickness));//10.2.2017
 		std::vector<Paths> ps_layer = mesh.mesh_interval_hatches_int_[i];
 		TriMesh::HatchesForOneLayersInterval interval_hatches_of_a_layer;
 		for (int j = 0; j < ps_layer.size();j++)
@@ -391,7 +402,8 @@ void ScanPathPlan::getSlicedLayers(TriMesh &mesh, Slice &slice_of_date_manager)
 {
 	for (int i = 0; i < slice_of_date_manager.slicing.size(); i++)
 	{
-		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		//double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		double z = (slice_of_date_manager.model_min_z +0.00001+ i*(slice_of_date_manager.thickness));//10.2.2017
 		mesh.mesh_layers_.push_back(z);
 	}
 }
@@ -401,7 +413,8 @@ void ScanPathPlan::transformIntervalContoursfromCIntToDouble(TriMesh &mesh, Slic
 {
 	for (int i = 0; i < mesh.mesh_areas_betweent_hexagons_int_paths_.size(); i++)//intervals between hexagonal subareas
 	{
-		double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		//double z = (slice_of_date_manager.model_min_z + (i + 1)*(slice_of_date_manager.thickness));
+		double z = (slice_of_date_manager.model_min_z + 0.00001 + i*(slice_of_date_manager.thickness));//10.2.2017
 		Paths ps = mesh.mesh_areas_betweent_hexagons_int_paths_[i];
 		TriMesh::BetweenSegmentedLayers mesh_between_segmented_layers;
 		for (int j = 0; j < ps.size(); j++)

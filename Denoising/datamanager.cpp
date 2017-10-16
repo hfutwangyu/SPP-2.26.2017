@@ -298,3 +298,80 @@ bool DataManager::ExportCLIToFile(std::string filename, std::string first, std::
 	}
 	return true;
 }
+
+bool DataManager::ExportTXTToFile(std::string filename)
+{
+	std::ofstream out(filename, std::ios::out | std::ios::trunc);
+	if (out.is_open())
+	{
+		out << "$$HEADERSTART\n";
+		out << "$$ASCII\n";
+		out << "$$UNITS/1.0\n";
+		out << "$$VERSION/100\n";
+		out << "$$LABLE/1,part1\n";
+		time_t rawtime;
+		struct tm * timeinfo;
+		time(&rawtime);
+		timeinfo = localtime(&rawtime);
+		int day = timeinfo->tm_mday;
+		int month = timeinfo->tm_mon;
+		int year = timeinfo->tm_year % 100;
+		if ((month + 1) < 10)
+		{
+			out << "$$DATE/" << day << 0 << month + 1 << year << "\n";
+		}
+		else
+		{
+			out << "$$DATE/" << day << month + 1 << year << "\n";
+		}
+
+		int layer_num = mesh_.mesh_layers_.size();
+		out << "$$LAYERS/" << layer_num << "\n";
+		out << "$$HEADEREND\n";
+
+		out << "$$GEOMETRYSTART\n";
+
+		if ((mesh_.mesh_hatches_.size() == mesh_.mesh_oriented_slicing_.size()))
+		{
+			for (int i = 0; i < mesh_.mesh_hatches_.size(); i++)
+			{
+				double z = mesh_.mesh_layers_[i];
+				out << "$$LAYER/" << z << "\n";
+
+				TriMesh::HatchesOfOneLayer hatches_of_a_layer_ = mesh_.mesh_hatches_[i];
+				out << "$$HATCHES/" << 1 << "," << hatches_of_a_layer_.size();
+				for (int j = 0; j < hatches_of_a_layer_.size();j++)
+				{
+					TriMesh::Segment seg = hatches_of_a_layer_[j];
+					TriMesh::Point start_pt = seg[0];
+					TriMesh::Point end_pt = seg[1];
+					out << "," << start_pt[0] << "," << start_pt[1] << "," << end_pt[0] << "," << end_pt[1];
+				}
+				out << "\n";
+
+				TriMesh::OrientedContours oriented_layer_contours = mesh_.mesh_oriented_slicing_[i];
+				//////////////////////////////////////////////////////////////////////////
+				//export layer's contours
+				for (int j = 0; j < oriented_layer_contours.size(); j++)
+				{
+					std::pair<int, TriMesh::Polylines>  a_oriented_layer_contour = oriented_layer_contours[j];
+					out << "$$POLYLINE/" << 1 << "," << a_oriented_layer_contour.first << "," << (a_oriented_layer_contour.second.size() + 1);
+					for (int k = 0; k < a_oriented_layer_contour.second.size(); k++)
+					{
+						TriMesh::Point pt = a_oriented_layer_contour.second[k];
+						out << "," << pt[0] << "," << pt[1];
+					}
+					TriMesh::Point pt = a_oriented_layer_contour.second[0];
+					out << "," << pt[0] << "," << pt[1] << "\n";
+				}
+			}
+		}
+		else
+		{
+			exit(1);
+		}
+
+		out << "$$GEOMETRYEND\n";
+	}
+	return true;
+}

@@ -125,14 +125,15 @@ void MeshExaminer::draw()
 			for (auto contours_iterator = z_contours.begin(); contours_iterator != z_contours.end(); contours_iterator++)
 			{
 				TriMesh::Polylines z_polyline = *contours_iterator;
-				glLineWidth(3);
+				glLineWidth(2.5);
 				glBegin(GL_LINE_LOOP);
 				//glBegin(GL_POLYGON);
 				for (auto polyline_iterator = z_polyline.begin(); polyline_iterator != z_polyline.end(); polyline_iterator++)
 				{
 					TriMesh::Point p = *polyline_iterator;
-
-					glColor3f(0.3f, 0.3f, 0.3f);
+					//glColor3f(0.0f, 1.0f, 0.0f);
+					//glColor3f(0.3f, 0.3f, 0.3f);
+					glColor3f(0.156f, 0.199f, 0.355f);
 					glVertex3f(p[0], p[1], p[2]);
 				}
 				glEnd();

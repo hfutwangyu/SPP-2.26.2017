@@ -30,6 +30,9 @@ void CalculationThread::initAlgorithm(DataManager *_data_manager, ParameterSet *
 	case kScanPathPlan:
 		mesh_denoise_base_ = new ScanPathPlan(_data_manager, _parameter_set);
 		break;
+	case kSimpleSPP:
+		mesh_denoise_base_ = new SimpleSSP(_data_manager, _parameter_set);
+		break;
 	case kNonIterativeFeaturePreservingMeshFiltering:
 		mesh_denoise_base_ = new NonIterativeFeaturePreservingMeshFiltering(_data_manager, _parameter_set);
 		break;

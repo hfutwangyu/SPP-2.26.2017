@@ -53,6 +53,17 @@ void ioThread::ExportCLI(QString &file_name)
 		emit(statusShowMessage("Writing CLI " + file_name + " successful."));
 }
 
+void ioThread::ExportCapitalCLI(QString &file_name)
+{
+	emit(statusShowMessage("Now writing CLI " + file_name + " ..."));
+	if (!data_manager_->ExportTXTToFile(file_name.toStdString()))
+	{
+		emit(statusShowMessage("Writing CLI " + file_name + " failed."));
+		return;
+	}
+	else
+		emit(statusShowMessage("Writing CLI " + file_name + " successful."));
+}
 
 void ioThread::run()
 {
@@ -62,4 +73,6 @@ void ioThread::run()
 		ExportMesh(file_name_);
 	else if (io_type_ == kExportCLI)
 		ExportCLI(file_name_);
+	else if (io_type_ == KExportCapitalCLI)
+		ExportCapitalCLI(file_name_);
 }

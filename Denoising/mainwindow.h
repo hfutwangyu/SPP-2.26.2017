@@ -46,6 +46,7 @@ private:
 	void ShowNoiseWidget();
 	void ShowBilateralMeshDenoisingWidget();
 	void ShowScanPathPlanWidget();//add for SPP,2.23.2017
+	void ShowSimpleSPPWidget();//add for SimpleSPP,10.2.2017
 	void ShowNonIterativeFeaturePreservingMeshFilteringWidget();
 	void ShowFastAndEffectiveFeaturePreservingMeshDenoisingWidget();
 	void ShowBilateralNormalFilteringForMeshDenoisingWidget();
@@ -75,6 +76,7 @@ private:
 	QAction *action_noise_;
 	QAction *action_bilateral_mesh_denoising_;
 	QAction *action_scan_path_plan_;//add for SPP 2.23.2017
+	QAction *action_simple_spp_;//add for SimpleSPP 10.2.2017
 	QAction *action_non_iterative_feature_preserving_mesh_filtering_;
 	QAction *action_fast_and_effective_feature_preserving_mesh_denoising_;
 	QAction *action_bilateral_normal_filtering_for_mesh_denoising_;

@@ -176,6 +176,7 @@
     <ClCompile Include="parameterset.cpp" />
     <ClCompile Include="parametersetwidget.cpp" />
     <ClCompile Include="ScanPathPlan.cpp" />
+    <ClCompile Include="SimpleSSP.cpp" />
     <ClCompile Include="Slice.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +193,7 @@
     <ClInclude Include="GetIntervalHatches.h" />
     <ClInclude Include="MyTimer.h" />
     <ClInclude Include="ScanPathPlan.h" />
+    <ClInclude Include="SimpleSSP.h" />
     <ClInclude Include="Slice.h" />
     <CustomBuild Include="calculationthread.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal

@@ -143,6 +143,9 @@ namespace OpenMesh {
 
 		typedef std::vector<double>                   Layers;//add for each layer position 3.22.2017
 
+		typedef std::vector<Segment>                  HatchesOfOneLayer;
+		typedef std::vector<HatchesOfOneLayer>        Hatches;//SimpSPP 10.2.2017
+
 	public:
 
 		//-------------------------------------------------- constructor / destructor
@@ -825,6 +828,8 @@ namespace OpenMesh {
 
 		Layers mesh_layers_;//add for each layer's position 3.22.2017
 		double mesh_layer_thickness_;//add for staircase display 8.31.2017
+
+		Hatches mesh_hatches_;//10.2.2017
 	private:
 		//standard vertex properties
 		PointsPropertyHandle                      points_;

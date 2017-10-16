@@ -169,6 +169,10 @@ void MainWindow::CreateActions()
 	action_scan_path_plan_->setStatusTip("Spp -- Scan Path Plan.");
 	connect(action_scan_path_plan_, SIGNAL(triggered()), this, SLOT(ShowScanPathPlanWidget()));////add for SPP,2.23.2017
 
+	action_simple_spp_= new QAction(tr("SimpleSpp"), this);
+	action_simple_spp_->setStatusTip("SimpleSpp --Simple Scan Path Plan.");
+	connect(action_simple_spp_, SIGNAL(triggered()), this, SLOT(ShowSimpleSPPWidget()));////add for SimpleSPP,10.2.2017
+
 	action_non_iterative_feature_preserving_mesh_filtering_ = new QAction(tr("Non-Iterative, Feature Preserving Mesh Filtering"), this);
 	action_non_iterative_feature_preserving_mesh_filtering_->setStatusTip("Denoise Mesh using Algorithm -- Non-Iterative, Feature Preserving Mesh Filtering.");
 	connect(action_non_iterative_feature_preserving_mesh_filtering_, SIGNAL(triggered()), this, SLOT(ShowNonIterativeFeaturePreservingMeshFilteringWidget()));
@@ -217,6 +221,7 @@ void MainWindow::CreateMenus()
 	menu_algorithms_->addAction(action_guided_mesh_normal_filtering_);
 	menu_algorithms_->addSeparator();
 	menu_algorithms_->addAction(action_scan_path_plan_);//add for SPP 2.23.2017
+	menu_algorithms_->addAction(action_simple_spp_);//add for SimpleSPP 10.2.2017
 	menu_algorithms_->setEnabled(false);
 
 	menu_view_ = menuBar()->addMenu(tr("View"));//add 3.13.2017
@@ -310,7 +315,7 @@ void MainWindow::ImportMesh()
 
 void MainWindow::ExportMesh()
 {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Export Mesh"), ".", tr(" CLI FILE (*.cli);;OBJ File (*.obj);;OFF File (*.off);;PLY File (*.ply)"));
+	QString filename = QFileDialog::getSaveFileName(this, tr("Export Mesh"), ".", tr(" CLI FILE (*.cli);; TXT FILE (*.CLI);;OBJ File (*.obj);;OFF File (*.off);;PLY File (*.ply)"));
 	// add for CLI export 3.22.2017  
 
 	if (filename.isNull())
@@ -338,6 +343,12 @@ void MainWindow::ExportMesh()
 
 		io_thread_->setFileName(filename);
 		io_thread_->io_type_ = ioThread::kExportCLI;
+	}
+	else if (filename.endsWith(".CLI"))
+	{
+
+		io_thread_->setFileName(filename);
+		io_thread_->io_type_ = ioThread::KExportCapitalCLI;
 	}
 	else
 	{
@@ -401,6 +412,13 @@ void MainWindow::ShowBilateralMeshDenoisingWidget()
 void MainWindow::ShowScanPathPlanWidget()//add for SPP,2.23.2017
 {
 	calculation_thread_->algorithms_type_ = CalculationThread::kScanPathPlan;
+	CloseWidget();
+	ShowWidget();
+}
+
+void MainWindow::ShowSimpleSPPWidget()//add for SimpleSPP,10.2.2017
+{
+	calculation_thread_->algorithms_type_ = CalculationThread::kSimpleSPP;
 	CloseWidget();
 	ShowWidget();
 }
